@@ -12,7 +12,11 @@ public protocol Realm {
     func supports(credentials: Credentials) -> Bool
 }
 
-public class DummyRealm {
+public class DummyRealm: Realm {
+    public init() {
+        
+    }
+    
     public func authenticate(credentials: Credentials) -> Account {
         return DummyAccount()
     }
