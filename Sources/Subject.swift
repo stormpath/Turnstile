@@ -23,6 +23,10 @@ public class Subject {
         account = try turnstile.authenticate(credentials: credentials)
     }
     
+    public func register(credentials: Credentials) throws {
+        try turnstile.register(credentials: credentials)
+    }
+    
     public func logout() {
         if let sessionIdentifier = sessionIdentifier {
             turnstile.sessionManager.deleteSession(identifier: sessionIdentifier)
@@ -34,8 +38,8 @@ public protocol Credentials {
 }
 
 public struct UsernamePasswordCredentials: Credentials {
-    let username: String
-    let password: String
+    public let username: String
+    public let password: String
     
     public init(username: String, password: String) {
         self.username = username
@@ -43,4 +47,6 @@ public struct UsernamePasswordCredentials: Credentials {
     }
 }
 
-public struct IncorrectCredentialsError: ErrorProtocol {}
+public struct IncorrectCredentialsError: ErrorProtocol {
+    public init() {}
+}

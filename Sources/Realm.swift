@@ -40,5 +40,5 @@ public class DummyRealm: Realm {
 }
 
 struct DummyAccount: Account {
-    var id = "jaweifja"
+    var accountID: String? = "jaweifja"
 }

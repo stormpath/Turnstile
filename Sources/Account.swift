@@ -7,5 +7,5 @@
 //
 
 public protocol Account {
-    var id: String { get }
+    var accountID: String? { get }
 }

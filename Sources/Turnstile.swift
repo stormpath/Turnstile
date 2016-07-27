@@ -33,6 +33,21 @@ public class Turnstile {
         }
         throw error ?? UnsupportedAccountError()
     }
+    
+    public func register(credentials: Credentials) throws -> Account {
+        let supportedRealms = realms.filter({ $0.supports(credentials: credentials) })
+        var error: ErrorProtocol?
+        
+        for realm in supportedRealms {
+            do {
+                return try realm.register(credentials: credentials)
+            }
+            catch let thrownError {
+                error = thrownError
+            }
+        }
+        throw error ?? UnsupportedAccountError()
+    }
 }
 
 struct UnsupportedAccountError: ErrorProtocol {}
