@@ -6,6 +6,6 @@
 //
 //
 
-protocol Bootable {
+public protocol Bootable {
     func boot(turnstile: Turnstile)
 }

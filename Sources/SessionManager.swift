@@ -6,6 +6,6 @@
 //
 //
 
-protocol SessionManager: Bootable {
-    subscript(index identifier: String) -> Subject { get set }
+public protocol SessionManager: Bootable {
+    subscript(identifier: String) -> Subject { get set }
 }
