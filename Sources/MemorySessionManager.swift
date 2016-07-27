@@ -8,20 +8,20 @@
 
 import Foundation
 
-class VaporSessionManager: SessionManager {
+public class MemorySessionManager: SessionManager {
     var sessions = [String: Subject]()
     weak var turnstile: Turnstile!
     
-    func boot(turnstile: Turnstile) {
+    public func boot(turnstile: Turnstile) {
         self.turnstile = turnstile
     }
     
     
-    func getSubject(identifier: String) -> Subject? {
+    public func getSubject(identifier: String) -> Subject? {
         return sessions[identifier]
     }
     
-    func createSession(subject: Subject) -> String {
+    public func createSession(subject: Subject) -> String {
         // Temp implementation; actually fix later
         let identifier = String(arc4random_uniform(1000000))
         subject.sessionIdentifier = identifier
@@ -29,7 +29,7 @@ class VaporSessionManager: SessionManager {
         return identifier
     }
     
-    func deleteSession(identifier: String) {
+    public func deleteSession(identifier: String) {
         sessions.removeValue(forKey: identifier)
     }
 }
