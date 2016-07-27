@@ -8,7 +8,11 @@
 
 public class Subject {
     weak var turnstile: Turnstile!
-    var account: Account?
+    public var account: Account?
+    
+    public var authentiated: Bool {
+        return account != nil
+    }
     
     public init(turnstile: Turnstile) {
         self.turnstile = turnstile
