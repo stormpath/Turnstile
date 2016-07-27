@@ -17,8 +17,17 @@ public class DummyRealm: Realm {
         
     }
     
-    public func authenticate(credentials: Credentials) -> Account {
-        return DummyAccount()
+    public func authenticate(credentials: Credentials) throws -> Account {
+        guard supports(credentials: credentials) else {
+            throw IncorrectCredentialsError()
+        }
+        let credentials = credentials as! UsernamePasswordCredentials
+        
+        if credentials.password == "TestTest1" {
+            return DummyAccount()
+        } else {
+            throw IncorrectCredentialsError()
+        }
     }
     
     public func register(credentials: Credentials) -> Account {

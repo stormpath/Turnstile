@@ -18,4 +18,21 @@ public class Turnstile {
         
         sessionManager.boot(turnstile: self)
     }
+    
+    public func authenticate(credentials: Credentials) throws -> Account {
+        let supportedRealms = realms.filter({ $0.supports(credentials: credentials) })
+        var error: ErrorProtocol?
+        
+        for realm in supportedRealms {
+            do {
+                return try realm.authenticate(credentials: credentials)
+            }
+            catch let thrownError {
+                error = thrownError
+            }
+        }
+        throw error ?? UnsupportedAccountError()
+    }
 }
+
+struct UnsupportedAccountError: ErrorProtocol {}
