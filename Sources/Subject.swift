@@ -9,6 +9,7 @@
 public class Subject {
     weak var turnstile: Turnstile!
     public var account: Account?
+    public var sessionIdentifier: String?
     
     public var authentiated: Bool {
         return account != nil
@@ -20,6 +21,12 @@ public class Subject {
     
     public func login(credentials: Credentials) throws {
         account = try turnstile.authenticate(credentials: credentials)
+    }
+    
+    public func logout() {
+        if let sessionIdentifier = sessionIdentifier {
+            turnstile.sessionManager.deleteSession(identifier: sessionIdentifier)
+        }
     }
 }
 
