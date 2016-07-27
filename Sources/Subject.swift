@@ -33,6 +33,11 @@ public struct UsernamePasswordCredentials: Credentials {
     public func verify() -> Bool {
         return password == "TestTest1"
     }
+    
+    public init(username: String, password: String) {
+        self.username = username
+        self.password = password
+    }
 }
 
 public struct IncorrectCredentialsError: ErrorProtocol {}
