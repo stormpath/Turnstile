@@ -7,5 +7,7 @@
 //
 
 public protocol SessionManager: Bootable {
-    subscript(identifier: String) -> Subject { get set }
+    func getSession(identifier: String)
+    func createSession(subject: Subject) -> String
+    func deleteSession(subject: Subject)
 }
