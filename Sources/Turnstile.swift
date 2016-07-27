@@ -7,10 +7,10 @@
 //
 
 public class Turnstile {
-    let sessionManager: SessionManager
-    static var sharedTurnstile: Turnstile!
+    public let sessionManager: SessionManager
+    public static var sharedTurnstile: Turnstile!
     
-    init(sessionManager: SessionManager) {
+    public init(sessionManager: SessionManager) {
         self.sessionManager = sessionManager
         
         sessionManager.boot(turnstile: self)

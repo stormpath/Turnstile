@@ -6,14 +6,14 @@
 //
 //
 
-class Subject {
+public class Subject {
     weak var turnstile: Turnstile!
     
-    init(turnstile: Turnstile) {
+    public init(turnstile: Turnstile) {
         self.turnstile = turnstile
     }
     
-    func login(credentials: Credentials) throws {
+    public func login(credentials: Credentials) throws {
         if credentials.verify() {
             print("success!")
         } else {
@@ -22,17 +22,17 @@ class Subject {
     }
 }
 
-protocol Credentials {
+public protocol Credentials {
     func verify() -> Bool
 }
 
-struct UsernamePasswordCredentials: Credentials {
+public struct UsernamePasswordCredentials: Credentials {
     let username: String
     let password: String
     
-    func verify() -> Bool {
+    public func verify() -> Bool {
         return password == "TestTest1"
     }
 }
 
-struct IncorrectCredentialsError: ErrorProtocol {}
+public struct IncorrectCredentialsError: ErrorProtocol {}
