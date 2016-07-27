@@ -12,6 +12,8 @@ public class MemorySessionManager: SessionManager {
     var sessions = [String: Subject]()
     weak var turnstile: Turnstile!
     
+    public init() {}
+    
     public func boot(turnstile: Turnstile) {
         self.turnstile = turnstile
     }
