@@ -11,7 +11,7 @@ public class Subject {
     public var account: Account?
     public var sessionIdentifier: String?
     
-    public var authentiated: Bool {
+    public var authenticated: Bool {
         return account != nil
     }
     
