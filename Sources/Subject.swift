@@ -11,7 +11,7 @@ public class Subject {
     public var authDetails: AuthenticationDetails?
     
     public var authenticated: Bool {
-        return authDetails?.account != nil
+        return authDetails != nil
     }
     
     public init(turnstile: Turnstile) {
