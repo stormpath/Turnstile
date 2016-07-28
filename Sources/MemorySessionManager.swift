@@ -26,7 +26,6 @@ public class MemorySessionManager: SessionManager {
     public func createSession(subject: Subject) -> String {
         // Temp implementation; actually fix later
         let identifier = String(arc4random_uniform(1000000))
-        subject.sessionIdentifier = identifier
         sessions[identifier] = subject
         return identifier
     }

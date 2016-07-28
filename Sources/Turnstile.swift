@@ -19,13 +19,13 @@ public class Turnstile {
         sessionManager.boot(turnstile: self)
     }
     
-    public func login(credentials: Credentials) throws -> Account {
-        let supportedRealms = realms.filter({ $0.canLogin(credentialType: credentials.dynamicType) })
+    public func authenticate(credentials: Credentials) throws -> Account {
+        let supportedRealms = realms.filter({ $0.canAuthenticate(credentialType: credentials.dynamicType) })
         var error: ErrorProtocol?
         
         for realm in supportedRealms {
             do {
-                return try realm.login(credentials: credentials)
+                return try realm.authenticate(credentials: credentials)
             }
             catch let thrownError {
                 error = thrownError
