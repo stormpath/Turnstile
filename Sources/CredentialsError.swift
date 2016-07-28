@@ -17,10 +17,18 @@ public struct GenericError: CredentialsError {
         return "We shouldn't actually use this error in the future"
     }
 }
-public struct IncorrectCredentialsError: ErrorProtocol {
+public struct IncorrectCredentialsError: CredentialsError {
     public init() {}
     
     public var description: String {
         return "Invalid Credentials"
+    }
+}
+
+public struct UnsupportedCredentialsError: CredentialsError {
+    public init() {}
+    
+    public var description: String {
+        return "Unsupported Credentials"
     }
 }
