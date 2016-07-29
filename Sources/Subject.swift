@@ -27,7 +27,7 @@ public class Subject {
     }
     
     public func register(credentials: Credentials) throws {
-        try turnstile.register(credentials: credentials)
+        _ = try turnstile.register(credentials: credentials)
     }
     
     public func logout() {

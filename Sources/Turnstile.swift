@@ -31,7 +31,7 @@ public class Turnstile {
                 error = thrownError
             }
         }
-        throw error ?? UnsupportedAccountError()
+        throw error ?? UnsupportedCredentialsError()
     }
     
     public func register(credentials: Credentials) throws -> Account {
@@ -46,8 +46,6 @@ public class Turnstile {
                 error = thrownError
             }
         }
-        throw error ?? UnsupportedAccountError()
+        throw error ?? UnsupportedCredentialsError()
     }
 }
-
-struct UnsupportedAccountError: ErrorProtocol {}

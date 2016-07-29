@@ -6,7 +6,7 @@
 //
 //
 
-public struct TokenCredentials {
+public struct TokenCredentials: Credentials {
     public let token: String
     
     public init(token: String) {
