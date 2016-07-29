@@ -7,8 +7,6 @@
 //
 
 public protocol Realm {
-    func canAuthenticate(credentialType: Credentials.Type) -> Bool
     func authenticate(credentials: Credentials) throws -> Account
-    func canRegister(credentialType: Credentials.Type) -> Bool
     func register(credentials: Credentials) throws -> Account
 }

@@ -11,10 +11,6 @@ public class MemoryRealm: Realm {
     
     public init() { }
     
-    public func canAuthenticate(credentialType: Credentials.Type) -> Bool {
-        return credentialType is PasswordCredentials.Type
-    }
-    
     public func authenticate(credentials: Credentials) throws -> Account {
         guard let credentials = credentials as? PasswordCredentials else {
             throw IncorrectCredentialsError()
@@ -29,10 +25,6 @@ public class MemoryRealm: Realm {
         } else {
             throw IncorrectCredentialsError()
         }
-    }
-    
-    public func canRegister(credentialType: Credentials.Type) -> Bool {
-        return credentialType is PasswordCredentials.Type
     }
     
     public func register(credentials: Credentials) throws -> Account {
