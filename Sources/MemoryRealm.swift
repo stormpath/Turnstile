@@ -48,7 +48,7 @@ public class MemoryRealm: Realm {
 }
 
 struct MemoryAccount: Account {
-    var accountID: String?
+    var accountID: String
     
     init(id: String) {
         accountID = id
