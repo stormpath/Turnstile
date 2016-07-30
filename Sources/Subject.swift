@@ -34,6 +34,7 @@ public class Subject {
         if let sessionIdentifier = authDetails?.sessionID {
             turnstile.sessionManager.deleteSession(identifier: sessionIdentifier)
         }
+        authDetails = nil
     }
 }
 
