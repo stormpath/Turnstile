@@ -14,12 +14,12 @@ public class Subject {
         return authDetails != nil
     }
     
-    public init(turnstile: Turnstile) {
+    init(turnstile: Turnstile) {
         self.turnstile = turnstile
     }
     
     public func login(credentials: Credentials, persist: Bool = false) throws {
-        let account = try turnstile.authenticate(credentials: credentials)
+        let account = try turnstile.realm.authenticate(credentials: credentials)
         let sessionID: String? = persist ? turnstile.sessionManager.createSession(subject: self) : nil
         let credentialType = credentials.dynamicType
         
@@ -27,7 +27,7 @@ public class Subject {
     }
     
     public func register(credentials: Credentials) throws {
-        _ = try turnstile.register(credentials: credentials)
+        _ = try turnstile.realm.register(credentials: credentials)
     }
     
     public func logout() {

@@ -8,42 +8,18 @@
 
 public class Turnstile {
     public let sessionManager: SessionManager
-    public let realms: [Realm]
+    public let realm: Realm
     
     public static var sharedTurnstile: Turnstile!
     
-    public init(sessionManager: SessionManager, realms: [Realm]) {
+    public init(sessionManager: SessionManager, realm: Realm) {
         self.sessionManager = sessionManager
-        self.realms = realms
+        self.realm = realm
         
         sessionManager.boot(turnstile: self)
     }
     
-    public func authenticate(credentials: Credentials) throws -> Account {
-        var error: ErrorProtocol?
-        
-        for realm in realms {
-            do {
-                return try realm.authenticate(credentials: credentials)
-            }
-            catch let thrownError {
-                error = thrownError
-            }
-        }
-        throw error ?? UnsupportedCredentialsError()
-    }
-    
-    public func register(credentials: Credentials) throws -> Account {
-        var error: ErrorProtocol?
-        
-        for realm in realms {
-            do {
-                return try realm.register(credentials: credentials)
-            }
-            catch let thrownError {
-                error = thrownError
-            }
-        }
-        throw error ?? UnsupportedCredentialsError()
+    public func createSubject() -> Subject {
+        return Subject(turnstile: self)
     }
 }
