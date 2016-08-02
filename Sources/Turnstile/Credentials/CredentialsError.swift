@@ -6,7 +6,7 @@
 //
 //
 
-public protocol CredentialsError: ErrorProtocol, CustomStringConvertible {
+public protocol CredentialsError: Error, CustomStringConvertible {
     // Stub protocol
 }
 
