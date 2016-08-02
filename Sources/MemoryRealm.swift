@@ -16,11 +16,7 @@ public class MemoryRealm: Realm {
             throw IncorrectCredentialsError()
         }
         
-        guard let password = users[credentials.username] else {
-            throw IncorrectCredentialsError()
-        }
-        
-        if credentials.password == password {
+        if credentials.password == users[credentials.username] {
             return MemoryAccount(id: credentials.username)
         } else {
             throw IncorrectCredentialsError()
