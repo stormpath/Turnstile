@@ -6,6 +6,8 @@
 //
 //
 
+/// A protocol representing an actual user account returned from a Realm.
 public protocol Account {
+    /// The account ID
     var accountID: String { get }
 }
