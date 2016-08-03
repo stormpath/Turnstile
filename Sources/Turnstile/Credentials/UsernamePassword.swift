@@ -9,7 +9,7 @@
 /**
  PasswordCredentials represents a username/password, email/password, etc pair.
  */
-public struct PasswordCredentials: Credentials {
+public struct UsernamePassword: Credentials {
     /// Username or email address
     public let username: String
     

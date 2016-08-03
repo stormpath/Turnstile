@@ -10,7 +10,7 @@
  TokenCredentials represents a computer-generated token, usually for API and
  mobile device authentication, but can also represent password reset tokens / etc.
  */
-public struct TokenCredentials: Credentials {
+public struct Token: Credentials {
     /// The token as a String
     public let token: String
     

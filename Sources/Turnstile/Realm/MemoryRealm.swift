@@ -20,7 +20,7 @@ public class MemoryRealm: Realm {
      Authenticates PasswordCredentials against the Realm.
      */
     public func authenticate(credentials: Credentials) throws -> Account {
-        guard let credentials = credentials as? PasswordCredentials else {
+        guard let credentials = credentials as? UsernamePassword else {
             throw UnsupportedCredentialsError()
         }
         
@@ -35,7 +35,7 @@ public class MemoryRealm: Realm {
      Registers PasswordCredentials against the MemoryRealm.
      */
     public func register(credentials: Credentials) throws -> Account {
-        guard let credentials = credentials as? PasswordCredentials else {
+        guard let credentials = credentials as? UsernamePassword else {
             throw UnsupportedCredentialsError()
         }
         guard users[credentials.username] == nil else {

@@ -10,7 +10,7 @@
  A struct representing an API Key ID / Secret pair. This can also be called
  a `client_id` and `client_secret`.
  */
-public struct APIKeyCredentials: Credentials {
+public struct APIKey: Credentials {
     /// The API Key ID
     public let id: String
     
