@@ -19,7 +19,7 @@ public class Turnstile {
         sessionManager.boot(turnstile: self)
     }
     
-    public func createSubject() -> Subject {
-        return Subject(turnstile: self)
+    public func createUser() -> User {
+        return User(turnstile: self)
     }
 }

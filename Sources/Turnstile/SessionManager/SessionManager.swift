@@ -7,7 +7,7 @@
 //
 
 public protocol SessionManager: Bootable {
-    func getSubject(identifier: String) -> Subject?
-    func createSession(subject: Subject) -> String
+    func getUser(identifier: String) -> User?
+    func createSession(user: User) -> String
     func deleteSession(identifier: String)
 }

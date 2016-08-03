@@ -9,7 +9,7 @@
 import Foundation
 
 public class MemorySessionManager: SessionManager {
-    var sessions = [String: Subject]()
+    var sessions = [String: User]()
     weak var turnstile: Turnstile!
     
     public init() {}
@@ -19,14 +19,14 @@ public class MemorySessionManager: SessionManager {
     }
     
     
-    public func getSubject(identifier: String) -> Subject? {
+    public func getUser(identifier: String) -> User? {
         return sessions[identifier]
     }
     
-    public func createSession(subject: Subject) -> String {
+    public func createSession(user: User) -> String {
         // Temp implementation; actually fix later
         let identifier = String(arc4random_uniform(1000000))
-        sessions[identifier] = subject
+        sessions[identifier] = user
         return identifier
     }
     

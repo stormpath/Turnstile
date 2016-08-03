@@ -12,17 +12,17 @@ class TurnstileTests: XCTestCase {
         turnstile = Turnstile(sessionManager: sessionManager, realm: realm)
     }
     
-    func testThatTurnstileReturnsUniqueSubjects() {
-        let subject = turnstile.createSubject()
-        let subject2 = turnstile.createSubject()
+    func testThatTurnstileReturnsUniqueUsers() {
+        let User = turnstile.createUser()
+        let User2 = turnstile.createUser()
         
-        XCTAssert(subject !== subject2, "Turnstile should create unique subjects each time its called")
+        XCTAssert(User !== User2, "Turnstile should create unique Users each time its called")
     }
 
 
     static var allTests : [(String, (TurnstileTests) -> () throws -> Void)] {
         return [
-            ("testThatTurnstileReturnsUniqueSubjects", testThatTurnstileReturnsUniqueSubjects),
+            ("testThatTurnstileReturnsUniqueUsers", testThatTurnstileReturnsUniqueUsers),
         ]
     }
 }

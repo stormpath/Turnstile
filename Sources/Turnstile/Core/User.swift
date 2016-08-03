@@ -1,12 +1,12 @@
 //
-//  Subject.swift
+//  User.swift
 //  Turnstile
 //
 //  Created by Edward Jiang on 7/26/16.
 //
 //
 
-public class Subject {
+public class User {
     weak var turnstile: Turnstile!
     public var authDetails: AuthenticationDetails?
     
@@ -20,7 +20,7 @@ public class Subject {
     
     public func login(credentials: Credentials, persist: Bool = false) throws {
         let account = try turnstile.realm.authenticate(credentials: credentials)
-        let sessionID: String? = persist ? turnstile.sessionManager.createSession(subject: self) : nil
+        let sessionID: String? = persist ? turnstile.sessionManager.createSession(User: self) : nil
         let credentialType = credentials.dynamicType
         
         authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: credentialType)
