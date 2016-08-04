@@ -39,7 +39,7 @@ public class MemoryRealm: Realm {
             throw UnsupportedCredentialsError()
         }
         guard users[credentials.username] == nil else {
-            throw UnsupportedCredentialsError() /// TODO: come up with actual error
+            throw AccountTakenError()
         }
         users[credentials.username] = credentials.password
         return MemoryAccount(id: credentials.username)

@@ -40,3 +40,17 @@ public struct UnsupportedCredentialsError: CredentialsError {
         return "Unsupported Credentials"
     }
 }
+
+/**
+ AccountTakenError represents an error where a username, email, or other account identifier
+ being registered with a Realm is already used.
+ */
+public struct AccountTakenError: CredentialsError {
+    /// Empty initializer for AccountTakenError
+    public init() {}
+    
+    /// User-presentable error message
+    public var description: String {
+        return "The account is already registered."
+    }
+}
