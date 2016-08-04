@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import TurnstileCrypto
 
 /**
  MemorySessionManager manages sessions in-memory and is great for development
@@ -26,8 +26,10 @@ public class MemorySessionManager: SessionManager {
     
     /// Creates a session for a given User object and returns the identifier.
     public func createSession(user: User) -> String {
-        // TODO: Temp implementation; actually fix later
-        let identifier = String(arc4random_uniform(1000000))
+        // TODO: Use a 128 bit session ID (base64/62 encoded)
+        let random: Random = URandom()
+        
+        let identifier = String(random.int64)
         sessions[identifier] = user
         return identifier
     }
