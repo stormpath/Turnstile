@@ -3,6 +3,7 @@ import XCTest
 
 class MemoryRealmTests: XCTestCase {
     var memoryRealm = MemoryRealm()
+    
     let validCredentials = UsernamePassword(username: "ValidUsername", password: "ValidPassword")
     let invalidCredentials = UsernamePassword(username: "InvalidUsername", password: "InvalidPassword")
     let unsupportedCredentials = APIKey(id: "Unsupported", secret: "Unsupported")

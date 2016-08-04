@@ -15,6 +15,7 @@ import TurnstileCrypto
 public class MemorySessionManager: SessionManager {
     /// Dictionary of sessions
     private var sessions = [String: User]()
+    private let random: Random = URandom()
     
     /// Initializes the Session Manager. No config needed!
     public init() {}
@@ -27,9 +28,13 @@ public class MemorySessionManager: SessionManager {
     /// Creates a session for a given User object and returns the identifier.
     public func createSession(user: User) -> String {
         // TODO: Use a 128 bit session ID (base64/62 encoded)
-        let random: Random = URandom()
+        var identifier: String
         
-        let identifier = String(random.int64)
+        // Create new random identifiers and find an unused one.
+        repeat {
+            identifier = String(random.int64)
+        } while sessions[identifier] != nil
+        
         sessions[identifier] = user
         return identifier
     }
