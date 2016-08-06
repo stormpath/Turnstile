@@ -40,7 +40,7 @@ public class MemorySessionManager: SessionManager {
     }
     
     /// Deletes the session for a session identifier. 
-    public func deleteSession(identifier: String) {
+    public func destroySession(identifier: String) {
         sessions.removeValue(forKey: identifier)
     }
 }

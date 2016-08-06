@@ -48,7 +48,7 @@ public class User {
     /// Logs out the user, and deletes the current session.
     public func logout() {
         if let sessionIdentifier = authDetails?.sessionID {
-            turnstile.sessionManager.deleteSession(identifier: sessionIdentifier)
+            turnstile.sessionManager.destroySession(identifier: sessionIdentifier)
         }
         authDetails = nil
     }

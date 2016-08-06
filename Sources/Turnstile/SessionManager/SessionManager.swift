@@ -22,6 +22,6 @@ public protocol SessionManager {
     /// Creates a session for a given User object and returns the identifier.
     func createSession(user: User) -> String
     
-    /// Deletes the session for a session identifier.
-    func deleteSession(identifier: String)
+    /// Destroys the session for a session identifier.
+    func destroySession(identifier: String)
 }
