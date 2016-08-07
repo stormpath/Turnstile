@@ -5,6 +5,16 @@ language: generic
 sudo: required
 dist: trusty
 osx_image: xcode8
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew install openssl;
+      brew link --force openssl;
+    fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get install libssl-dev;
+    fi
 script:
   - eval "$(curl -sL swift.qutheory.io/ci)"
   - eval "$(curl -sL swift.qutheory.io/codecov)"
+notifications:
+  slack: talkstormpath:kN559lSL73v5N6DQ796LRtwm

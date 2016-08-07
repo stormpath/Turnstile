@@ -41,7 +41,7 @@ class MemorySessionManagerTests: XCTestCase {
     
     func testThatSessionManagerDeletesSession() {
         let sessionID = sessionManager.createSession(user: user)
-        sessionManager.deleteSession(identifier: sessionID)
+        sessionManager.destroySession(identifier: sessionID)
         let persistedUser = sessionManager.getUser(identifier: sessionID)
         
         XCTAssertNil(persistedUser, "The user should be deleted")
