@@ -9,14 +9,18 @@
 import Turnstile
 import Foundation
 import HTTP
-import Transport
 import JSON
 
+/**
+ OAuth 2 represents the base API Client 
+ */
 public class OAuth2 {
     public let clientID: String
     public let clientSecret: String
     public let authorizationURL: String
     public let tokenURL: String
+    
+    let HTTPClient = Client<TLSClientStream>.self
     
     public init(clientID: String, clientSecret: String, authorizationURL: String, tokenURL: String) {
         self.clientID = clientID
@@ -25,12 +29,12 @@ public class OAuth2 {
         self.tokenURL = tokenURL
     }
     
-    public func getLoginLink(redirectURI: String, state: String, scopes: [String] = []) -> String {
+    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> String {
         // TODO: serialize these better
         var loginLink = authorizationURL + "?"
         loginLink += "response_type=code"
         loginLink += "&client_id=" + clientID
-        loginLink += "&redirect_uri=" + redirectURI
+        loginLink += "&redirect_uri=" + redirectURL
         loginLink += "&state=" + state
         loginLink += "&scopes=" + scopes.joined(separator: "%20")
         
@@ -39,12 +43,13 @@ public class OAuth2 {
     
     public func exchange(authorizationCode: AuthorizationCode) throws -> Token {
         // TODO: serialize these better
-        let url = tokenURL + "?client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURI)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
+        let url = tokenURL + "?client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
         let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         
-        guard let response = try? Client<TCPClientStream>.respond(to: request),
+        guard let response = try? HTTPClient.respond(to: request),
             let accessToken = response.json?["access_token"]?.string else {
+                // TODO: actually handle this error
                 throw UnsupportedCredentialsError()
         }
         return Token(token: accessToken)

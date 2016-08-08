@@ -26,7 +26,6 @@
  */
 
 import TLS
-import HTTP
 import SecretSocks
 import Transport
 

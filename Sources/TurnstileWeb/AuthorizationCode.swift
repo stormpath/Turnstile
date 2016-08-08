@@ -8,7 +8,16 @@
 
 import Turnstile
 
+/**
+ An authorization code is a one-time use code that's mean to be used in OAuth 2
+ authorization code flows.
+ */
 public struct AuthorizationCode: Credentials {
-    let code: String
-    let redirectURI: String
+    public let code: String
+    public let redirectURL: String
+    
+    public init(code: String, redirectURL: String) {
+        self.code = code
+        self.redirectURL = redirectURL
+    }
 }
