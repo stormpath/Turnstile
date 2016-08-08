@@ -14,6 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .Package(url: "https://github.com/czechboy0/SecretSocks", majorVersion: 0, minor: 5),
-        .Package(url: "https://github.com/vapor/engine", majorVersion: 0, minor: 5)
+        .Package(url: "https://github.com/vapor/engine", majorVersion: 0, minor: 5),
+        .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 4)
     ]
 )
