@@ -18,8 +18,13 @@ class FacebookTests: XCTestCase {
     var facebook: Facebook!
     
     override func setUp() {
-        let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
-        let clientSecret = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_SECRET"] ?? ""
+        #if os(OSX) || os(iOS)
+            let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
+            let clientSecret = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_SECRET"] ?? ""
+        #elseif os(Linux)
+            let clientID = ProcessInfo.processInfo().environment["FACEBOOK_CLIENT_ID"] ?? ""
+            let clientSecret = ProcessInfo.processInfo().environment["FACEBOOK_CLIENT_SECRET"] ?? ""
+        #endif
         
         facebook = Facebook(clientID: clientID, clientSecret: clientSecret)
     }

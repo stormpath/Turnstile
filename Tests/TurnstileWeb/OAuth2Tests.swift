@@ -9,6 +9,8 @@
 @testable import TurnstileWeb
 import XCTest
 
+import Foundation
+
 class OAuth2Tests: XCTestCase {
     var oauth2: OAuth2!
     let validClientID = "validClientID"
