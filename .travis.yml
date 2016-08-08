@@ -1,6 +1,7 @@
 os:
   - linux
-  - osx
+#  - osx Removing temporarily as homebrew does not link OpenSSL
+# see https://github.com/Zewo/COpenSSL/issues/4
 language: generic
 sudo: required
 dist: trusty
