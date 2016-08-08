@@ -12,6 +12,7 @@ import XCTest
 import HTTP
 import JSON
 import Turnstile
+import Foundation
 
 class FacebookTests: XCTestCase {
     var facebook: Facebook!

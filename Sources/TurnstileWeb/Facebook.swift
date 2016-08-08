@@ -11,17 +11,25 @@ import Turnstile
 import HTTP
 import JSON
 
+/**
+ Facebook allows you to authenticate against Facebook for login purposes.
+ */
 public class Facebook: OAuth2, Realm {
+    /**
+     Create a Facebook object. Uses the Client ID and Client Secret from the
+     Facebook Developers Console.
+     */
     public init(clientID: String, clientSecret: String) {
         let tokenURL = "https://graph.facebook.com/v2.3/oauth/access_token"
         let authorizationURL = "https://www.facebook.com/dialog/oauth"
         super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
     }
     
+    /**
+     Authenticates a Facebook access token.
+     */
     public func authenticate(credentials: Credentials) throws -> Account {
         switch credentials {
-        case let credentials as AuthorizationCode:
-            return try authenticate(credentials: exchange(authorizationCode: credentials))
         case let credentials as Token:
             return try authenticate(credentials: credentials)
         default:
@@ -29,6 +37,9 @@ public class Facebook: OAuth2, Realm {
         }
     }
     
+    /**
+     Authenticates a Facebook access token.
+     */
     public func authenticate(credentials: Token) throws -> FacebookAccount {
         let url = "https://graph.facebook.com/debug_token?input_token=" + credentials.token + "&access_token=" + appAccessToken
         let request = try! Request(method: .get, uri: url)
@@ -51,6 +62,10 @@ public class Facebook: OAuth2, Realm {
     }
 }
 
+/**
+ A Facebook account
+ */
 public struct FacebookAccount: Account, Credentials {
+    // TODO: represent a lot more from the Facebook account.
     public let accountID: String
 }
