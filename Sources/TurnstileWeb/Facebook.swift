@@ -44,12 +44,15 @@ public class Facebook: OAuth2, Realm {
         let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         
-        guard let response = try? Client<TLSClientStream>.respond(to: request) else { throw UnsupportedCredentialsError() }
-        guard let responseData = response.json?["data"]?.object else { throw UnsupportedCredentialsError() }
+        guard let response = try? Client<TLSClientStream>.respond(to: request) else { throw APIConnectionError() }
+        guard let json = response.json else { throw InvalidAPIResponse() }
+        
+        guard let responseData = json["data"]?.object else {
+            throw FacebookError(json: json)
+        }
 
         if let accountID = responseData["user_id"]?.string
             , responseData["app_id"]?.string == clientID && responseData["is_valid"]?.bool == true {
-            // TODO: handle errors properly
             return FacebookAccount(accountID: accountID)
         }
         
@@ -67,4 +70,12 @@ public class Facebook: OAuth2, Realm {
 public struct FacebookAccount: Account, Credentials {
     // TODO: represent a lot more from the Facebook account.
     public let accountID: String
+}
+
+public struct FacebookError: TurnstileError {
+    public let description: String
+    
+    public init(json: JSON) {
+        description = json["error"]?["message"]?.string ?? "Unknown Facebook Login Error"
+    }
 }

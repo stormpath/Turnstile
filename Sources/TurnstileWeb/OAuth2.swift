@@ -65,6 +65,8 @@ public class OAuth2 {
     
     /// Exchanges an authorization code for an access token
     /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
+    /// - throws: APIConnectionError() if we cannot connect to the OAuth server
+    /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     public func exchange(authorizationCode: AuthorizationCode) throws -> Token {
         // TODO: serialize these better
         let url = tokenURL + "?client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
@@ -72,15 +74,27 @@ public class OAuth2 {
         
         request.headers["Accept"] = "application/json"
         
-        guard let response = try? HTTPClient.respond(to: request),
-            let accessToken = response.json?["access_token"]?.string else {
-                // TODO: actually handle this error
-                throw UnsupportedCredentialsError()
+        guard let response = try? HTTPClient.respond(to: request) else {
+            throw APIConnectionError()
+        }
+        guard let json = response.json else {
+            throw InvalidAPIResponse()
+        }
+        guard let accessToken = json["access_token"]?.string else {
+            if let error = OAuth2Error(json: json) {
+                throw error
+            } else {
+                throw InvalidAPIResponse()
+            }
         }
         return Token(token: accessToken)
     }
-}
-
-struct OAuthError: Error {
     
+    /// Convenience function for grabbing the authorization code from the query string
+    /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
+    /// - throws: APIConnectionError() if we cannot connect to the OAuth server
+    /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
+    public func exchange(codeFromQueryString queryString: String) throws -> Token {
+        preconditionFailure("Not implemented") // TODO
+    }
 }

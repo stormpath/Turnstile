@@ -10,7 +10,7 @@
  A credential error is usually related to authentication / authorization operations.
  All credentials errors will have a string conversion.
  */
-public protocol CredentialsError: Error, CustomStringConvertible { }
+public protocol CredentialsError: TurnstileError { }
 
 /**
  IncorrectCredentialsError represents an error thrown when the credential type
