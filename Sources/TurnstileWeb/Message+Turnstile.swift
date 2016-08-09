@@ -1,5 +1,5 @@
 //
-//  Message+JSON.swift
+//  Message+Turnstile.swift
 //  Turnstile
 //
 //  Created by Edward Jiang on 8/8/16.
