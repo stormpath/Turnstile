@@ -26,16 +26,16 @@ public class OAuth2 {
     public let clientSecret: String
     
     /// The Authorization Endpoint of the OAuth 2 Server
-    public let authorizationURL: URL
+    public let authorizationURL: String
     
     /// The Token Endpoint of the OAuth 2 Server
-    public let tokenURL: URL
+    public let tokenURL: String
     
     let HTTPClient = Client<TLSClientStream>.self
     
     
     /// Creates the OAuth 2 client
-    public init(clientID: String, clientSecret: String, authorizationURL: URL, tokenURL: URL) {
+    public init(clientID: String, clientSecret: String, authorizationURL: String, tokenURL: String) {
         self.clientID = clientID
         self.clientSecret = clientSecret
         self.authorizationURL = authorizationURL
@@ -50,38 +50,26 @@ public class OAuth2 {
     /// - parameter state:       A randomly generated string to prevent CSRF attacks. 
     ///     Verify this when validating the Authorization Code
     /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant.
-    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) throws -> URL {
-        let queryItems = ["response_type": "code",
-                          "client_id": clientID,
-                          "redirect_uri": redirectURL,
-                          "state": state,
-                          "scopes": scopes.joined(separator: " ")]
-        var urlComponents = URLComponents(url: authorizationURL, resolvingAgainstBaseURL: false)
-        urlComponents?.setQueryItems(dict: queryItems)
+    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> String {
+        // TODO: serialize these better
+        var loginLink = authorizationURL + "?"
+        loginLink += "response_type=code"
+        loginLink += "&client_id=" + clientID
+        loginLink += "&redirect_uri=" + redirectURL
+        loginLink += "&state=" + state
+        loginLink += "&scopes=" + scopes.joined(separator: "%20")
         
-        if let result = urlComponents?.url {
-            return result
-        } else {
-            throw OAuthError() // TODO: replace with a better error
-        }
+        return loginLink
     }
     
     
     /// Exchanges an authorization code for an access token
     /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
     public func exchange(authorizationCode: AuthorizationCode) throws -> Token {
-        let queryItems = ["client_id": clientID,
-                          "client_secret": clientSecret,
-                          "redirect_uri": authorizationCode.redirectURL,
-                          "code": authorizationCode.code]
-        var urlComponents = URLComponents(url: tokenURL, resolvingAgainstBaseURL: false)
-        urlComponents?.setQueryItems(dict: queryItems)
+        // TODO: serialize these better
+        let url = tokenURL + "?client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
+        let request = try! Request(method: .get, uri: url)
         
-        guard let url = urlComponents?.url else {
-            throw OAuthError() // TODO: replace with a better error
-        }
-        
-        let request = try Request(method: .get, url: url)
         request.headers["Accept"] = "application/json"
         
         guard let response = try? HTTPClient.respond(to: request),
@@ -95,16 +83,4 @@ public class OAuth2 {
 
 struct OAuthError: Error {
     
-}
-
-extension Request {
-    convenience init(method: HTTP.Method, url: URL) throws {
-        try self.init(method: method, uri: url.absoluteString)
-    }
-}
-
-extension URLComponents {
-    mutating func setQueryItems(dict: [String: String]) {
-        self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
-    }
 }

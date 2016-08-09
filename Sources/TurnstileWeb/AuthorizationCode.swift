@@ -29,4 +29,5 @@ public struct InvalidAuthorizationCodeError: Error, CredentialsError {
     /// User-presentable error message
     public var description: String {
         return "The authorization code supplied could not be verified"
-    }}
+    }
+}
