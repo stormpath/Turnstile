@@ -67,13 +67,11 @@ class UserTests: XCTestCase {
         XCTAssert(persistedUser == nil, "The user should not be persisted")
     }
     
-    static var allTests : [(String, (UserTests) -> () throws -> Void)] {
-        return [
-            ("testThatUserCanRegisterWithCredentials", testThatUserCanRegisterWithCredentials),
-            ("testThatUserCanAuthenticate", testThatUserCanAuthenticate),
-            ("testThatUserAuthenticationCanPersist", testThatUserAuthenticationCanPersist),
-            ("testThatUserCanLogout", testThatUserCanLogout),
-            ("testThatUserLogoutIsRemovedFromSession", testThatUserLogoutIsRemovedFromSession)
-        ]
-    }
+    static var allTests = [
+        ("testThatUserCanRegisterWithCredentials", testThatUserCanRegisterWithCredentials),
+        ("testThatUserCanAuthenticate", testThatUserCanAuthenticate),
+        ("testThatUserAuthenticationCanPersist", testThatUserAuthenticationCanPersist),
+        ("testThatUserCanLogout", testThatUserCanLogout),
+        ("testThatUserLogoutIsRemovedFromSession", testThatUserLogoutIsRemovedFromSession)
+    ]
 }

@@ -64,6 +64,11 @@ class FacebookTests: XCTestCase {
     private var appAccessToken: String {
         return facebook.clientID + "%7C" + facebook.clientSecret
     }
+    
+    static var allTests = [
+        ("testThatFacebookAuthenticatesValidAccessToken", testThatFacebookAuthenticatesValidAccessToken),
+        ("testThatFacebookDoesntAuthenticateInvalidAccessToken", testThatFacebookDoesntAuthenticateInvalidAccessToken)
+    ]
 }
 
 extension Token {

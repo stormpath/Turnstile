@@ -31,10 +31,8 @@ class URandomTests: XCTestCase {
         }
     }
     
-    static var allTests : [(String, (URandomTests) -> () throws -> Void)] {
-        return [
-            ("testThatRandomDoesntCrash", testThatRandomDoesntCrash),
-            ("testRandomBytes", testRandomBytes)
-        ]
-    }
+    static var allTests = [
+        ("testThatRandomDoesntCrash", testThatRandomDoesntCrash),
+        ("testRandomBytes", testRandomBytes)
+    ]
 }

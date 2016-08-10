@@ -86,12 +86,10 @@ class BCryptTests: XCTestCase {
     }
     
     
-    static var allTests : [(String, (BCryptTests) -> () throws -> Void)] {
-        return [
-            ("testBCrypt", testBCrypt),
-            ("testBCryptBytes", testBCryptBytes)
-        ]
-    }
+    static var allTests = [
+        ("testBCrypt", testBCrypt),
+        ("testBCryptBytes", testBCryptBytes)
+    ]
 }
 
 extension String {

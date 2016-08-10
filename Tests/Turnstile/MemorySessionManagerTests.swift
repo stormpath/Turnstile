@@ -47,11 +47,9 @@ class MemorySessionManagerTests: XCTestCase {
         XCTAssertNil(persistedUser, "The user should be deleted")
     }
     
-    static var allTests : [(String, (MemorySessionManagerTests) -> () throws -> Void)] {
-        return [
-            ("testThatSessionManagerCanCreateSessionForUser", testThatSessionManagerCanCreateSessionForUser),
-            ("testThatSessionManagerManagesMultipleUsers", testThatSessionManagerManagesMultipleUsers),
-            ("testThatSessionManagerDeletesSession", testThatSessionManagerDeletesSession)
-        ]
-    }
+    static var allTests = [
+        ("testThatSessionManagerCanCreateSessionForUser", testThatSessionManagerCanCreateSessionForUser),
+        ("testThatSessionManagerManagesMultipleUsers", testThatSessionManagerManagesMultipleUsers),
+        ("testThatSessionManagerDeletesSession", testThatSessionManagerDeletesSession)
+    ]
 }

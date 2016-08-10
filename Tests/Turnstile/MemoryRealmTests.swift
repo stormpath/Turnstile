@@ -49,12 +49,10 @@ class MemoryRealmTests: XCTestCase {
         }
     }
     
-    static var allTests : [(String, (MemoryRealmTests) -> () throws -> Void)] {
-        return [
-            ("testAuthenticateWithValidCredentialsSucceeds", testAuthenticateWithValidCredentialsSucceeds),
-            ("testAuthenticateWithIncorrectCredentialsThrowsError", testAuthenticateWithIncorrectCredentialsThrowsError),
-            ("testAuthenticateWithUnsupportedCredentialsThrowsError", testAuthenticateWithUnsupportedCredentialsThrowsError),
-            ("testRegisterTakenAccountThrowsError", testRegisterTakenAccountThrowsError)
-        ]
-    }
+    static var allTests = [
+        ("testAuthenticateWithValidCredentialsSucceeds", testAuthenticateWithValidCredentialsSucceeds),
+        ("testAuthenticateWithIncorrectCredentialsThrowsError", testAuthenticateWithIncorrectCredentialsThrowsError),
+        ("testAuthenticateWithUnsupportedCredentialsThrowsError", testAuthenticateWithUnsupportedCredentialsThrowsError),
+        ("testRegisterTakenAccountThrowsError", testRegisterTakenAccountThrowsError)
+    ]
 }

@@ -56,4 +56,8 @@ class OAuth2Tests: XCTestCase {
     func testThatAuthorizationCodeParsesError() {
         // NOT IMPLEMENTED - need to mock HTTPClient
     }
+    
+    static var allTests = [
+        ("testThatCorrectLoginLinkIsGenerated", testThatCorrectLoginLinkIsGenerated)
+    ]
 }
