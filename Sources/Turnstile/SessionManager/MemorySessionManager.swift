@@ -31,7 +31,8 @@ public class MemorySessionManager: SessionManager {
     
     /// Creates a session for a given User object and returns the identifier.
     public func createSession(user: User) -> String {
-        // TODO: Use a 128 bit session ID (base64/62 encoded)
+        // TODO: Use a 128 bit session ID (base64/62 encoded) when Foundation works on Linux.
+        // Not a priority right now since MemorySessionManager is not for production use.
         var identifier: String
         
         // Create new random identifiers and find an unused one.

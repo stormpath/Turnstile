@@ -9,7 +9,7 @@
 /**
  PasswordCredentials represents a username/password, email/password, etc pair.
  */
-public struct UsernamePassword: Credentials {
+public class UsernamePassword: Credentials {
     /// Username or email address
     public let username: String
     
@@ -22,5 +22,14 @@ public struct UsernamePassword: Credentials {
         self.password = password
     }
     
-    // TODO: Should deinit the credentials and wipe memory for password
+    deinit {
+        password.nulTerminatedUTF8.withUnsafeBufferPointer { (bufferPointer) -> Void in
+            var pointer = UnsafeMutablePointer<UInt8>(bufferPointer.baseAddress)!
+            
+            for _ in 0..<bufferPointer.count {
+                pointer = pointer.successor()
+                pointer.pointee = 0
+            }
+        }
+    }
 }

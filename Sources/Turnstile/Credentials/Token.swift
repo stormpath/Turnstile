@@ -10,7 +10,7 @@
  TokenCredentials represents a computer-generated token, usually for API and
  mobile device authentication, but can also represent password reset tokens / etc.
  */
-public struct Token: Credentials {
+public class Token: Credentials {
     /// The token as a String
     public let token: String
     
@@ -18,5 +18,16 @@ public struct Token: Credentials {
     public init(token: String) {
         /// User-presentable error message
         self.token = token
+    }
+    
+    deinit {
+        token.nulTerminatedUTF8.withUnsafeBufferPointer { (bufferPointer) -> Void in
+            var pointer = UnsafeMutablePointer<UInt8>(bufferPointer.baseAddress)!
+            
+            for _ in 0..<bufferPointer.count {
+                pointer = pointer.successor()
+                pointer.pointee = 0
+            }
+        }
     }
 }
