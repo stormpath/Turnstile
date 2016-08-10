@@ -19,13 +19,15 @@ public struct OAuth2Error: TurnstileError {
     public let description: String
     public let uri: String
     
+    /// Initializer an OAuth error with a code, description, and uri
     public init(code: OAuth2ErrorCode, description: String? = nil, uri: String? = nil) {
         self.code = code
         self.description = description ?? code.rawValue
         self.uri = uri ?? ""
     }
     
-    public init?(json: JSON) {
+    /// Convenience initializer from JSON
+    init?(json: JSON) {
         guard let errorCode = json["error"]?.string,
               let code = OAuth2ErrorCode(rawValue: errorCode) else {
                 return nil
@@ -33,6 +35,7 @@ public struct OAuth2Error: TurnstileError {
         self.init(code: code, description: json["error_description"]?.string, uri: json["error_uri"]?.string)
     }
     
+    /// Convenience initializer from a dictionary representing the JSON or URL parameters
     public init?(dict: [String: String]) {
         guard let errorCode = dict["error"],
             let code = OAuth2ErrorCode(rawValue: errorCode) else {

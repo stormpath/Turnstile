@@ -72,7 +72,7 @@ class FacebookTests: XCTestCase {
 }
 
 extension Token {
-    init?(facebookResponse response: Response) {
+    convenience init?(facebookResponse response: Response) {
         guard let accessToken = response.json?["access_token"]?.string else {
             return nil
         }
