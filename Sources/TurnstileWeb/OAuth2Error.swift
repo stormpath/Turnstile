@@ -32,6 +32,14 @@ public struct OAuth2Error: TurnstileError {
         }
         self.init(code: code, description: json["error_description"]?.string, uri: json["error_uri"]?.string)
     }
+    
+    public init?(dict: [String: String]) {
+        guard let errorCode = dict["error"],
+            let code = OAuth2ErrorCode(rawValue: errorCode) else {
+                return nil
+        }
+        self.init(code: code, description: dict["error_description"], uri: dict["error_uri"])
+    }
 }
 
 /**

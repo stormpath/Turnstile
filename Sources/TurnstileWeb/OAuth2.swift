@@ -10,6 +10,7 @@ import Turnstile
 import Foundation
 import HTTP
 import JSON
+import URI
 
 /**
  OAuth 2 represents the base API Client for an OAuth 2 server that implements the
@@ -90,11 +91,35 @@ public class OAuth2 {
         return Token(token: accessToken)
     }
     
-    /// Convenience function for grabbing the authorization code from the query string
+    /// Parses a URL and exchanges the OAuth 2 access token and exchanges it for a
     /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
-    public func exchange(codeFromQueryString queryString: String) throws -> Token {
-        preconditionFailure("Not implemented") // TODO
+    /// - throws: OAuth2Error() if the oauth server calls back with an error
+    public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> Token {
+        guard let uri = try? URI(url), let query = uri.queryDictionary else { throw InvalidAPIResponse() }
+        
+        guard let code = query["code"], query["state"] == state else {
+            throw OAuth2Error(dict: query) ?? InvalidAPIResponse()
+        }
+        
+        let redirectURL = url.substring(to: url.range(of: "?")!.lowerBound)
+        return try exchange(authorizationCode: AuthorizationCode(code: code, redirectURL: redirectURL))
+    }
+}
+
+private extension URI {
+    var queryDictionary: [String: String]? {
+        guard let queryComponents = self.query?.components(separatedBy: "&") else { return nil }
+        
+        var result = [String: String]()
+        for component in queryComponents {
+            let pair = component.components(separatedBy: "=")
+            
+            if pair.count == 2 {
+                result[pair[0]] = pair[1]
+            }
+        }
+        return result
     }
 }
