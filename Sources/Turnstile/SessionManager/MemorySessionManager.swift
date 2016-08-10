@@ -21,8 +21,12 @@ public class MemorySessionManager: SessionManager {
     public init() {}
     
     /// Gets the user for the current session identifier.
-    public func getUser(identifier: String) -> User? {
-        return sessions[identifier]
+    public func getUser(identifier: String) throws -> User {
+        if let user = sessions[identifier] {
+            return user
+        } else {
+            throw InvalidSessionError()
+        }
     }
     
     /// Creates a session for a given User object and returns the identifier.

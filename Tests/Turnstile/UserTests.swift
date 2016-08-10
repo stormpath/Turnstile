@@ -41,7 +41,7 @@ class UserTests: XCTestCase {
             return
         }
         
-        let persistedUser = turnstile.sessionManager.getUser(identifier: identifier)
+        let persistedUser = try? turnstile.sessionManager.getUser(identifier: identifier)
         
         XCTAssert(persistedUser === user, "The user authentication should be persisted")
     }
@@ -61,10 +61,12 @@ class UserTests: XCTestCase {
         }
         user.logout()
         
-        let persistedUser = turnstile.sessionManager.getUser(identifier: identifier)
+        do {
+            _ = try turnstile.sessionManager.getUser(identifier: identifier)
+            XCTFail("The user should not be persisted")
+        } catch {}
         
         XCTAssert(!user.authenticated, "The user should not be authenticated anymore")
-        XCTAssert(persistedUser == nil, "The user should not be persisted")
     }
     
     static var allTests = [

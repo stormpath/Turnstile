@@ -17,7 +17,7 @@ class MemorySessionManagerTests: XCTestCase {
     
     func testThatSessionManagerCanCreateSessionForUser() {
         let sessionID = sessionManager.createSession(user: user)
-        let persistedUser = sessionManager.getUser(identifier: sessionID)
+        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
         
         XCTAssert(persistedUser === user, "The user persisted should be the same")
     }
@@ -28,8 +28,8 @@ class MemorySessionManagerTests: XCTestCase {
         let sessionID = sessionManager.createSession(user: user)
         let sessionID2 = sessionManager.createSession(user: user2)
         
-        let persistedUser = sessionManager.getUser(identifier: sessionID)
-        let persistedUser2 = sessionManager.getUser(identifier: sessionID2)
+        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
+        let persistedUser2 = try? sessionManager.getUser(identifier: sessionID2)
         
         XCTAssertNotEqual(sessionID, sessionID2,
                           "Session IDs for two different users should not be the same")
@@ -42,9 +42,20 @@ class MemorySessionManagerTests: XCTestCase {
     func testThatSessionManagerDeletesSession() {
         let sessionID = sessionManager.createSession(user: user)
         sessionManager.destroySession(identifier: sessionID)
-        let persistedUser = sessionManager.getUser(identifier: sessionID)
+        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
         
         XCTAssertNil(persistedUser, "The user should be deleted")
+    }
+    
+    func testThatSessionManagerErrorsForUnknownSessions() {
+        let unknownSessionID = "invalidSessionID"
+        
+        do {
+            try sessionManager.getUser(identifier: unknownSessionID)
+            XCTFail("An error should be thrown")
+        } catch let error {
+            XCTAssert(error is InvalidSessionError, "The error should be an invalid session")
+        }
     }
     
     static var allTests = [

@@ -14,14 +14,21 @@
 public protocol SessionManager {
     /**
      Gets the user for the current session identifier.
-     
-     TODO: change this to a throwing interface
      */
-    func getUser(identifier: String) -> User?
+    func getUser(identifier: String) throws -> User
     
     /// Creates a session for a given User object and returns the identifier.
     func createSession(user: User) -> String
     
     /// Destroys the session for a session identifier.
     func destroySession(identifier: String)
+}
+
+/**
+ An invalid Session error is thrown when a session ID presented could not be found.
+ */
+public struct InvalidSessionError: TurnstileError {
+    public let description = "Invalid session ID"
+    
+    public init() {}
 }
