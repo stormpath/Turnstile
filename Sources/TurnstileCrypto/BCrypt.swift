@@ -345,39 +345,6 @@ public class BCrypt {
         return salt
     }
     
-    private static func generateNumberSequenceBetween(first: Int32, and second: Int32, ofLength length: Int, withUniqueValues unique: Bool) -> [Int32] {
-        if length < 1 {
-            return [Int32]()
-        }
-        
-        var sequence : [Int32] = [Int32](repeating: 0, count: length)
-        if unique {
-            if (first <= second && (length > (second - first) + 1)) ||
-                (first > second  && (length > (first - second) + 1)) {
-                return [Int32]()
-            }
-            
-            var loop : Int = 0
-            while loop < length {
-                let number = generateNumber(between: first, and: second)
-                
-                // If the number is unique, add it to the sequence
-                if !isNumber(number: number, inSequence: sequence, ofLength: loop) {
-                    sequence[loop] = number
-                    loop += 1
-                }
-            }
-        }
-        else {
-            // Repetitive values are allowed
-            for i in 0 ..< length {
-                sequence[i] = generateNumber(between: first, and: second)
-            }
-        }
-        
-        return sequence
-    }
-    
     /**
      Hashes the password (using the UTF8 encoding) with the specified salt.
      */
@@ -645,39 +612,6 @@ public class BCrypt {
             
             i += 2
         }
-    }
-    
-    private static func isNumber(number: Int32, inSequence sequence: [Int32], ofLength length: Int) -> Bool {
-        if length < 1 || length > sequence.count {
-            return false
-        }
-        
-        for i in 0 ..< length where sequence[i] == number {
-            return true
-        }
-        
-        // The number was not found, return false
-        return false
-    }
-    
-    private static func generateNumber(between first: Int32, and second: Int32) -> Int32 {
-        var low : Int32
-        var high : Int32
-        
-        if first <= second {
-            low  = first
-            high = second
-        }
-        else {
-            low  = second
-            high = first
-        }
-        
-        let modular = UInt32((high - low) + 1)
-        
-        let random = BCrypt.random.uint32
-        
-        return Int32(random % modular) + low
     }
 }
 
