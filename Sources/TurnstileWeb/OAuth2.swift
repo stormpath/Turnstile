@@ -106,6 +106,8 @@ public class OAuth2 {
         let redirectURL = url.substring(to: url.range(of: "?")!.lowerBound)
         return try exchange(authorizationCode: AuthorizationCode(code: code, redirectURL: redirectURL))
     }
+    
+    // TODO: add refresh token support
 }
 
 private extension URI {

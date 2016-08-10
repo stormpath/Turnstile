@@ -62,6 +62,8 @@ public class Facebook: OAuth2, Realm {
     private var appAccessToken: String {
         return clientID + "%7C" + clientSecret
     }
+    
+    // TODO: add facebook specific auth types (like reauthenticate, rerequest)
 }
 
 /**
@@ -72,9 +74,14 @@ public struct FacebookAccount: Account, Credentials {
     public let accountID: String
 }
 
+/**
+ An error resulting from Facebook Login
+ */
 public struct FacebookError: TurnstileError {
+    /// Description of the error
     public let description: String
     
+    /// Initializer
     public init(json: JSON) {
         description = json["error"]?["message"]?.string ?? "Unknown Facebook Login Error"
     }
