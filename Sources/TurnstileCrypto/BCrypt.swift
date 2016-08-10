@@ -50,9 +50,10 @@
 import Foundation
 
 public class BCrypt {
-    static let random = URandom()
+    private static let random = URandom()
     
-    static let P_orig : [UInt32] = [
+    // Initial contents of key schedule
+    private static let P_orig : [UInt32] = [
         0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344,
         0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89,
         0x452821e6, 0x38d01377, 0xbe5466cf, 0x34e90c6c,
@@ -60,7 +61,7 @@ public class BCrypt {
         0x9216d5d9, 0x8979fb1b
     ]
     
-    static let S_orig : [UInt32] = [
+    private static let S_orig : [UInt32] = [
         0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7,
         0xb8e1afed, 0x6a267e96, 0xba7c9045, 0xf12c7f99,
         0x24a19947, 0xb3916cf7, 0x0801f2e2, 0x858efc16,
@@ -319,17 +320,22 @@ public class BCrypt {
         0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6
     ]
     
-    static let magicString : [Int32] = [
+    // bcrypt IV: "OrpheanBeholderScryDoubt"
+    private static let magicString : [Int32] = [
         0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274
     ]
     
     private var p : UnsafeMutablePointer<Int32>! // [Int32]
     private var s : UnsafeMutablePointer<Int32>! // [Int32]
     
-    let plen: Int = 18
-    let slen: Int = 1024
+    private let plen: Int = 18
+    private let slen: Int = 1024
     
-    static func generateSaltWithNumberOfRounds(rounds: UInt) -> String {
+    /**
+     Generates a BCrypt Salt with the specified number of rounds.
+      - returns: String    The generated salt.
+     */
+    public static func generateSalt(rounds: Int = 10) -> String {
         let randomData: [Int8] = random.random(numBytes: 16).map({Int8(bitPattern: $0)})
         
         var salt : String
@@ -339,7 +345,7 @@ public class BCrypt {
         return salt
     }
     
-    static func generateNumberSequenceBetween(first: Int32, and second: Int32, ofLength length: Int, withUniqueValues unique: Bool) -> [Int32] {
+    private static func generateNumberSequenceBetween(first: Int32, and second: Int32, ofLength length: Int, withUniqueValues unique: Bool) -> [Int32] {
         if length < 1 {
             return [Int32]()
         }
@@ -373,59 +379,9 @@ public class BCrypt {
     }
     
     /**
-     Generates a salt with a defaulted set of 10 rounds.
-     
-     :returns: String    The generated salt.
+     Hashes the password (using the UTF8 encoding) with the specified salt.
      */
-    static func generateSalt() -> String {
-        return BCrypt.generateSaltWithNumberOfRounds(rounds: 10)
-    }
-    
-    public static func derive(fromKey key: [UInt8], withSalt salt: [UInt8], rounds: UInt) throws -> [UInt8] {
-        let key = key.map {
-            Int8(bitPattern: $0)
-        }
-        
-        let salt = salt.map {
-            Int8(bitPattern: $0)
-        }
-        
-        return try BCrypt().hashPassword(key, withSalt: salt, cost: Int(rounds)).map {
-            UInt8(bitPattern: $0)
-        }
-    }
-    
-    public static func derive(fromKey key: String, withSalt salt: [UInt8], rounds: UInt) throws -> [UInt8] {
-        let keyPreEncoding = key + "\0"
-        let key: [Int8] = [UInt8](keyPreEncoding.utf8).map {
-            Int8(bitPattern: $0)
-        }
-        
-        let salt = salt.map {
-            Int8(bitPattern: $0)
-        }
-        
-        return try BCrypt().hashPassword(key, withSalt: salt, cost: Int(rounds)).map {
-            UInt8(bitPattern: $0)
-        }
-    }
-    
-    public static func hashPassword(_ passwordData: [Int8], withSalt saltData: [Int8] = random.random(numBytes: 16).map({Int8($0)}), rounds: Int) throws -> String {
-        let bCrypt = BCrypt( )
-        let hashedData = try bCrypt.hashPassword(passwordData, withSalt: saltData, cost: rounds)
-        
-        let hashedPassword = "$2a$\(rounds < 10 ? "0" : "")\(rounds)" + "$"
-        
-        //        let saltedData = NSData(bytes: saltData, length: saltData.count)
-        //        let hashData = NSData(bytes: hashedData, length: hashedData.count)
-        
-        let saltString = Base64.encode(data: saltData, untilLength: UInt(saltData.count))
-        let hashedString = Base64.encode(data: hashedData, untilLength: 23)
-        
-        return hashedPassword + saltString + hashedString
-    }
-    
-    public static func hashPassword(_ password: String, withSalt salt: String = BCrypt.generateSalt()) throws -> String {
+    public static func hash(password: String, withSalt salt: String = BCrypt.generateSalt()) throws -> String {
         var bCrypt: BCrypt
         var realSalt: String
         var minor: Character = "\000"[0]
@@ -480,8 +436,8 @@ public class BCrypt {
         
         let saltData: [Int8] = Base64.decode(realSalt, untilLength: 16)
         
-        bCrypt = BCrypt( )
-        let hashedData = try bCrypt.hashPassword(passwordData, withSalt: saltData, cost: rounds)
+        bCrypt = BCrypt()
+        let hashedData = try bCrypt.hash(password: passwordData, withSalt: saltData, cost: rounds)
         
         var hashedPassword : String = "$2" + ((minor >= "a") ? String(minor) : "") + "$"
         
@@ -493,8 +449,11 @@ public class BCrypt {
         return hashedPassword + saltString + hashedString
     }
     
-    public static func verifyPassword(_ password: String, matchesHash hash: String) throws -> Bool {
-        return try BCrypt.hashPassword(password, withSalt: hash) == hash
+    /**
+     Validates that the password matches the hash.
+     */
+    public static func verify(password: String, matchesHash hash: String) throws -> Bool {
+        return try BCrypt.hash(password: password, withSalt: hash) == hash
     }
     
     private static func streamToWordWithData(data: UnsafeMutablePointer<Int8>, ofLength length: Int, off offp: inout Int32) -> Int32 {
@@ -511,7 +470,7 @@ public class BCrypt {
         return word
     }
     
-    private func hashPassword(_ password: [Int8], withSalt salt: [Int8], cost numberOfRounds: Int) throws -> [Int8] {
+    private func hash(password: [Int8], withSalt salt: [Int8], cost numberOfRounds: Int) throws -> [Int8] {
         var rounds : Int
         var j      : Int
         let clen   : Int = 6
@@ -722,30 +681,34 @@ public class BCrypt {
     }
 }
 
-enum BCryptError: Error {
+public enum BCryptError: Error, CustomStringConvertible {
     case invalidRounds(Int)
     case invalidSaltLength(Int)
     case invalidVersion(String)
     case invalidSalt(String)
+    
+    public var description: String {
+        return "BCrypt has encountered an error"
+    }
 }
 
-extension String {
-    internal subscript (i: Int) -> Character {
+private extension String {
+    subscript (i: Int) -> Character {
         return self[index(self.startIndex, offsetBy: i)]
     }
     
-    internal subscript (i: Int) -> String {
+    subscript (i: Int) -> String {
         return String(self[i] as Character)
     }
     
-    internal subscript (r: Range<Int>) -> String {
+    subscript (r: Range<Int>) -> String {
         let r2 = Range.init(uncheckedBounds: (lower: index(startIndex, offsetBy: r.lowerBound), upper: index(startIndex, offsetBy: r.upperBound)))
         
         return substring(with: r2)
     }
 }
 
-extension Character {
+private extension Character {
     func utf16Value() -> UInt16 {
         for s in String(self).utf16 {
             return s
@@ -754,8 +717,12 @@ extension Character {
     }
 }
 
+/**
+ Base64 extension for BCrypt. This is a weird base64 since instead of using
+ /+ for the last two characters, or the urlEncoded -_, it uses /.
+ */
 extension BCrypt {
-    public struct Base64 {
+    struct Base64 {
         static let encodingTable : [Character] = [
             ".", "/", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
             "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
@@ -780,7 +747,7 @@ extension BCrypt {
             51, 52, 53, -1, -1, -1, -1, -1
         ]
         
-        public static func encode(data: [Int8], untilLength length: UInt) -> String {
+        static func encode(data: [Int8], untilLength length: UInt) -> String {
             if data.count == 0 || length == 0 {
                 return ""
             }
@@ -841,7 +808,7 @@ extension BCrypt {
             return decodingTable[Int(xAsInt)]
         }
         
-        public static func decode(_ s: String, untilLength maxolen: UInt) -> [Int8] {
+        static func decode(_ s: String, untilLength maxolen: UInt) -> [Int8] {
             let maxolen = Int(maxolen)
             
             var off : Int = 0

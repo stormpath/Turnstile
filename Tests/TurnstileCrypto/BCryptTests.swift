@@ -54,41 +54,43 @@ class BCryptTests: XCTestCase {
         ("~!@#$%^&*()      ~!@#$%^&*()PNBFRa", "$2a$06$fPIsBO8qRqkjj273rfaOIa", "$2a$06$fPIsBO8qRqkjj273rfaOI.HtSV9jLDpTbZn782DC6/t7qT67P6Ffa", 6),
         ]
     
-    func testBCryptBytes() throws {
+    func testBCryptVerify() throws {
         for test in tests {
-            let salt = BCrypt.Base64.decode(test.1[7..<(test.1.characters.count)], untilLength: UInt(test.1.characters.count - 7)).map {
-                UInt8(bitPattern: $0)
-            }
-            let hash = test.2[test.1.characters.count..<test.2.characters.count]
-            let hashBytes = BCrypt.Base64.decode(hash, untilLength: UInt(hash.characters.count)).map {
-                UInt8(bitPattern: $0)
-            }
-            
-            var newHash = try BCrypt.derive(fromKey: test.0, withSalt: salt, rounds: UInt(test.3))
-            newHash = Array(newHash[0..<23])
-            
-            XCTAssertEqual(newHash, hashBytes)
-        }
-    }
-    
-    func testBCrypt() throws {
-        for test in tests {
-            XCTAssert(try BCrypt.verifyPassword(test.0, matchesHash: test.2))
+            XCTAssert(try BCrypt.verify(password: test.0, matchesHash: test.2))
         }
         
         for test in falseTests {
             do {
-                if try BCrypt.verifyPassword(test.0, matchesHash: test.2) {
+                if try BCrypt.verify(password: test.0, matchesHash: test.2) {
                     XCTFail()
                 }
             } catch { }
         }
     }
     
+    func testBCryptGeneratesSalts() {
+        let salt = BCrypt.generateSalt()
+        let salt12 = BCrypt.generateSalt(rounds: 12)
+        
+        XCTAssert(salt.hasPrefix("$2a$10"), "The prefix should be $2a (for BCrypt) and $10 (iterations)")
+        XCTAssertEqual(salt.characters.count, 29, "The salt should always be 29 characters")
+        
+        XCTAssert(salt12.hasPrefix("$2a$12"), "The prefix should be $2a (for BCrypt) and $12 (iterations)")
+        XCTAssertEqual(salt12.characters.count, 29, "The salt should always be 29 characters")
+    }
+    
+    func testBCryptHashesPasswordsProperly() throws {
+        for test in tests {
+            XCTAssertEqual(try BCrypt.hash(password: test.0, withSalt: test.1), test.2, "The hashed password should match the precomputed hash")
+        }
+    }
+    
+    // TODO: should test for BCrypt error conditions too
     
     static var allTests = [
-        ("testBCrypt", testBCrypt),
-        ("testBCryptBytes", testBCryptBytes)
+        ("testBCryptVerify", testBCryptVerify),
+        ("testBCryptGeneratesSalts", testBCryptGeneratesSalts),
+        ("testBCryptGeneratesSalts", testBCryptGeneratesSalts)
     ]
 }
 

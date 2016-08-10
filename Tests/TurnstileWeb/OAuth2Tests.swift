@@ -28,25 +28,7 @@ class OAuth2Tests: XCTestCase {
     func testThatCorrectLoginLinkIsGenerated() {
         let url = oauth2.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
         
-        XCTAssert(url.hasPrefix("https://example.com"))
-        
-        guard let urlComponents = URLComponents.init(string: url) else {
-            XCTFail("The URL Generated is invalid")
-            return
-        }
-        
-        XCTAssertEqual(urlComponents.path, "/oauth/authorize")
-        
-        guard let queryItems = urlComponents.queryItems else {
-            XCTFail("The URL Generated needs a query string")
-            return
-        }
-        
-        XCTAssert(queryItems.contains(URLQueryItem(name: "client_id", value: validClientID)))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "response_type", value: "code")))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "redirect_uri", value: redirectURL)))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "state", value: state)))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "scopes", value: scopes.joined(separator: " "))))
+        XCTAssertEqual(url, "https://example.com/oauth/authorize?response_type=code&client_id=validClientID&redirect_uri=https://example.com/callback&state=12345&scopes=email%20profile")
     }
     
     func testThatAuthorizationCodeIsExchangedForToken() {
