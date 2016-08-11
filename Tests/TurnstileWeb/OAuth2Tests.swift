@@ -28,7 +28,7 @@ class OAuth2Tests: XCTestCase {
     func testThatCorrectLoginLinkIsGenerated() {
         let url = oauth2.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
         
-        XCTAssertEqual(url, "https://example.com/oauth/authorize?response_type=code&client_id=validClientID&redirect_uri=https://example.com/callback&state=12345&scopes=email%20profile")
+        XCTAssertEqual(url, "https://example.com/oauth/authorize?response_type=code&client_id=validClientID&redirect_uri=https://example.com/callback&state=12345&scope=email%20profile")
     }
     
     func testThatAuthorizationCodeIsExchangedForToken() {

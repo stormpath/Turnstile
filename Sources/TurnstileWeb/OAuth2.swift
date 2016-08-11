@@ -58,7 +58,7 @@ public class OAuth2 {
         loginLink += "&client_id=" + clientID
         loginLink += "&redirect_uri=" + redirectURL
         loginLink += "&state=" + state
-        loginLink += "&scopes=" + scopes.joined(separator: "%20")
+        loginLink += "&scope=" + scopes.joined(separator: "%20")
         
         return loginLink
     }
@@ -70,8 +70,8 @@ public class OAuth2 {
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     public func exchange(authorizationCode: AuthorizationCode) throws -> Token {
         // TODO: serialize these better
-        let url = tokenURL + "?client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
-        let request = try! Request(method: .get, uri: url)
+        let url = tokenURL + "?grant_type=authorization_code&client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
+        let request = try! Request(method: .post, uri: url)
         
         request.headers["Accept"] = "application/json"
         
@@ -82,6 +82,7 @@ public class OAuth2 {
             throw InvalidAPIResponse()
         }
         guard let accessToken = json["access_token"]?.string else {
+            // Facebook doesn't do this error properly... probably have to override this
             if let error = OAuth2Error(json: json) {
                 throw error
             } else {
