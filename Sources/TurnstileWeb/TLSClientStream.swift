@@ -25,6 +25,7 @@
  SOFTWARE.
  */
 
+#if os(Linux)
 import TLS
 import SecretSocks
 import Transport
@@ -66,3 +67,4 @@ extension TLS.Socket: Stream {
         // no flush, send immediately flushes
     }
 }
+#endif

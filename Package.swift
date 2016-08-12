@@ -1,6 +1,6 @@
 import PackageDescription
 
-let package = Package(
+var package = Package(
     name: "Turnstile",
     targets: [
         Target(
@@ -13,8 +13,11 @@ let package = Package(
             dependencies: [.Target(name: "Turnstile")]),
     ],
     dependencies: [
-        .Package(url: "https://github.com/czechboy0/SecretSocks.git", majorVersion: 0, minor: 5),
         .Package(url: "https://github.com/vapor/engine.git", majorVersion: 0, minor: 5),
         .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 4)
     ]
 )
+
+#if os(Linux)
+package.dependencies.append(Dependency.Package(url: "https://github.com/czechboy0/SecretSocks.git", majorVersion: 0, minor: 5))
+#endif

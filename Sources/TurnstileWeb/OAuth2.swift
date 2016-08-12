@@ -11,6 +11,7 @@ import Foundation
 import HTTP
 import JSON
 import URI
+import Transport
 
 /**
  OAuth 2 represents the base API Client for an OAuth 2 server that implements the
@@ -32,7 +33,11 @@ public class OAuth2 {
     /// The Token Endpoint of the OAuth 2 Server
     public let tokenURL: String
     
+    #if os(Linux)
     let HTTPClient = Client<TLSClientStream>.self
+    #else
+    let HTTPClient = Client<FoundationStream>.self
+    #endif
     
     
     /// Creates the OAuth 2 client
