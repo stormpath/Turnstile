@@ -45,7 +45,7 @@ public class Google: OAuth2, Realm {
         let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         
-        guard let response = try? Client<TLSClientStream>.respond(to: request) else { throw APIConnectionError() }
+        guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
         guard let json = response.json else { throw InvalidAPIResponse() }
         
         guard let responseData = json["data"]?.object else {
