@@ -7,14 +7,52 @@
 
 Turnstile is a security framework for Swift inspired by [Apache Shiro](http://shiro.apache.org). It's used to manage the currently executing user account in your application, whether iOS app or backend web application. 
 
-Turnstile is currently a work in progress, and the API might change at any time. We're planning on releasing in the next two weeks:
+## Overview
 
-* Documentation
-* Full code coverage
-* An integration with [Vapor](https://github.com/qutheory/vapor), a Swift web framework
-* Turnstile Web, a package with OAuth components for the web. 
-* Four core components:
- * Session Management
- * Realms - connecting Turnstile with your application's data
- * User
- * Crypto - a basic API for hashing and generating random data
+Turnstile is the easiest way to add authentication to your Swift apps. Currently, the focus is on a great API for backend Swift apps. 
+
+Turnstile is split into three projects:
+
+* Turnstile Core - provides key components for authentication and security. 
+* Turnstile Crypto - tools for generating randomness, hashing, and encrypting data
+* Turnstile Web - integrations with Facebook, Google, and other helpers useful for backend web applications. 
+
+This document describes Turnstile Core -- however, many developers using Turnstile will most likely want to read the docs for Turnstile Web for Facebook / Google login. 
+
+## Getting Started
+
+The easiest way to use Turnstile is with one of its prebuilt integrations with Swift web frameworks. Currently, an integration with Vapor is in development, but integrations with Kitura and Perfect are planned. We'd love help building more integrations! 
+
+## Concepts
+
+If you'd like to use Turnstile to build your own integration, it's useful to understand key concepts in Turnstile. 
+
+### Turnstile
+
+Turnstile is the main object that manages the relationship between all of the other Turnstile objects. You'd use this API in an integration for a framework / etc, but not as much as an end user of Turnstile. 
+
+### User
+
+The user object represents the currently operating user, also known as "subject" in security terms. This user is the API that the end developer using an integration will interact with to authenticate users.
+
+The user object also supports registration, however this is a convenience for basic uses cases. Since different apps have different user management needs, it's expected that many developers will write their own registration logic, but use Turnstile to authenticate. 
+
+### Realm
+
+A realm connects Turnstile to your data store, and allows Turnstile to authenticate and register accounts. 
+
+To use Turnstile, an end developer will most likely be implementing their own realm. 
+
+### SessionManager
+
+SessionManager is a Turnstile component that manages sessions and persistience for your authentication system. 
+
+## Using
+
+### Writing a Realm
+
+### Writing a SessionManager
+
+## Contributing
+
+We're always open to contributions! Since this probject is fairly early stage, please join the [Stormpath slack channel](https://talkstormpath.shipit.xyz) to discuss how you can contribute!

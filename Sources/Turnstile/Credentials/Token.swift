@@ -12,6 +12,9 @@
  */
 public typealias Token = String
 
+/**
+ An access token is a token that can be used to authenticate a user with a service.
+ */
 public class AccessToken: Credentials {
     /// The token as a String
     public let string: Token

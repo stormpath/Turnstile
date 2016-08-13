@@ -90,7 +90,7 @@ class BCryptTests: XCTestCase {
     static var allTests = [
         ("testBCryptVerify", testBCryptVerify),
         ("testBCryptGeneratesSalts", testBCryptGeneratesSalts),
-        ("testBCryptGeneratesSalts", testBCryptGeneratesSalts)
+        ("testBCryptHashesPasswordsProperly", testBCryptHashesPasswordsProperly)
     ]
 }
 
