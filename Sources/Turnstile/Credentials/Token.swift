@@ -19,15 +19,4 @@ public class Token: Credentials {
         /// User-presentable error message
         self.token = token
     }
-    
-    deinit {
-        token.nulTerminatedUTF8.withUnsafeBufferPointer { (bufferPointer) -> Void in
-            var pointer = UnsafeMutablePointer<UInt8>(bufferPointer.baseAddress)!
-            
-            for _ in 0..<bufferPointer.count {
-                pointer = pointer.successor()
-                pointer.pointee = 0
-            }
-        }
-    }
 }
