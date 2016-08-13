@@ -47,7 +47,7 @@ class FacebookTests: XCTestCase {
     }
     
     func testThatFacebookDoesntAuthenticateInvalidAccessToken() {
-        let token = Token(token: "EAAY12345FAKETOKEN")
+        let token = AccessToken(string: "EAAY12345FAKETOKEN")
         
         let account = try? facebook.authenticate(credentials: token)
         
@@ -55,7 +55,7 @@ class FacebookTests: XCTestCase {
     }
     
     // Uses the FB graph API to create a test account and get its access token.
-    private func createFacebookAccessToken() -> Token? {
+    private func createFacebookAccessToken() -> AccessToken? {
         let url = "https://graph.facebook.com/\(facebook.clientID)/accounts/test-users?access_token=\(appAccessToken)"
         let request = try! Request(method: .post, uri: url)
         request.headers["Accept"] = "application/json"
@@ -64,7 +64,7 @@ class FacebookTests: XCTestCase {
             XCTFail("Could not connect to Facebook")
             return nil
         }
-        return Token(facebookResponse: response)
+        return AccessToken(facebookResponse: response)
     }
     
     private var appAccessToken: String {
@@ -77,13 +77,13 @@ class FacebookTests: XCTestCase {
     ]
 }
 
-extension Token {
+extension AccessToken {
     convenience init?(facebookResponse response: Response) {
         guard let accessToken = response.json?["access_token"]?.string else {
             return nil
         }
         
-        self.init(token: accessToken)
+        self.init(string: accessToken)
     }
 }
 

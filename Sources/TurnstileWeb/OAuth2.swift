@@ -73,7 +73,7 @@ public class OAuth2 {
     /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
-    public func exchange(authorizationCode: AuthorizationCode) throws -> Token {
+    public func exchange(authorizationCode: AuthorizationCode) throws -> OAuth2Token {
         // TODO: serialize these better
         let url = tokenURL + "?grant_type=authorization_code&client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
         let request = try! Request(method: .post, uri: url)
@@ -86,7 +86,7 @@ public class OAuth2 {
         guard let json = response.json else {
             throw InvalidAPIResponse()
         }
-        guard let accessToken = json["access_token"]?.string else {
+        guard let token = OAuth2Token(json: json) else {
             // Facebook doesn't do this error properly... probably have to override this
             if let error = OAuth2Error(json: json) {
                 throw error
@@ -94,7 +94,7 @@ public class OAuth2 {
                 throw InvalidAPIResponse()
             }
         }
-        return Token(token: accessToken)
+        return token
     }
     
     /// Parses a URL and exchanges the OAuth 2 access token and exchanges it for a
@@ -102,7 +102,7 @@ public class OAuth2 {
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     /// - throws: OAuth2Error() if the oauth server calls back with an error
-    public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> Token {
+    public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
         guard let uri = try? URI(url), let query = uri.queryDictionary else { throw InvalidAPIResponse() }
         
         guard let code = query["code"], query["state"] == state else {
@@ -114,6 +114,18 @@ public class OAuth2 {
     }
     
     // TODO: add refresh token support
+}
+
+public extension Realm where Self: OAuth2 {
+    public func authenticate(authorizationCodeCallbackURL url: String, state: String) throws -> Account {
+        let token = try exchange(authorizationCodeCallbackURL: url, state: state)
+        return try self.authenticate(credentials: token.accessToken)
+    }
+    
+    public func authenticate(authorizationCode: AuthorizationCode) throws -> Account {
+        let token = try exchange(authorizationCode: authorizationCode)
+        return try self.authenticate(credentials: token.accessToken)
+    }
 }
 
 private extension URI {

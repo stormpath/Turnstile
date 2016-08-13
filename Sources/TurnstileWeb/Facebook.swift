@@ -29,7 +29,7 @@ public class Facebook: OAuth2, Realm {
      */
     public func authenticate(credentials: Credentials) throws -> Account {
         switch credentials {
-        case let credentials as Token:
+        case let credentials as AccessToken:
             return try authenticate(credentials: credentials)
         default:
             throw UnsupportedCredentialsError()
@@ -39,8 +39,8 @@ public class Facebook: OAuth2, Realm {
     /**
      Authenticates a Facebook access token.
      */
-    public func authenticate(credentials: Token) throws -> FacebookAccount {
-        let url = "https://graph.facebook.com/debug_token?input_token=" + credentials.token + "&access_token=" + appAccessToken
+    public func authenticate(credentials: AccessToken) throws -> FacebookAccount {
+        let url = "https://graph.facebook.com/debug_token?input_token=" + credentials.string + "&access_token=" + appAccessToken
         let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         

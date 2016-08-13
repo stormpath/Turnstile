@@ -11,6 +11,8 @@ import Turnstile
 import HTTP
 import JSON
 
+// TODO: split out some of this logic into an OpenID Connect framework. 
+
 /**
  Google allows you to authenticate against Google for login purposes.
  */
@@ -30,7 +32,7 @@ public class Google: OAuth2, Realm {
      */
     public func authenticate(credentials: Credentials) throws -> Account {
         switch credentials {
-        case let credentials as Token:
+        case let credentials as AccessToken:
             return try authenticate(credentials: credentials)
         default:
             throw UnsupportedCredentialsError()
@@ -40,8 +42,8 @@ public class Google: OAuth2, Realm {
     /**
      Authenticates a Google access token.
      */
-    public func authenticate(credentials: Token) throws -> GoogleAccount {
-        let url = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.token
+    public func authenticate(credentials: AccessToken) throws -> GoogleAccount {
+        let url = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string
         let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         

@@ -7,16 +7,18 @@
 //
 
 /**
- TokenCredentials represents a computer-generated token, usually for API and
+ Token represents a computer-generated token, usually for API and
  mobile device authentication, but can also represent password reset tokens / etc.
  */
-public class Token: Credentials {
+public typealias Token = String
+
+public class AccessToken: Credentials {
     /// The token as a String
-    public let token: String
+    public let string: Token
     
     /// Initializer for TokenCredentials
-    public init(token: String) {
+    public init(string: Token) {
         /// User-presentable error message
-        self.token = token
+        self.string = string
     }
 }
