@@ -60,7 +60,7 @@ class FacebookTests: XCTestCase {
         let request = try! Request(method: .post, uri: url)
         request.headers["Accept"] = "application/json"
         
-        guard let response = try? Client<HTTPClient>.respond(to: request) else {
+        guard let response = try? HTTPClient.respond(to: request) else {
             XCTFail("Could not connect to Facebook")
             return nil
         }

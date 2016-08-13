@@ -1,3 +1,4 @@
+#if os(Linux)
 /**
  Brought in from https://github.com/vapor/tls-provider.
  Attribution and Copyright below:
@@ -74,3 +75,4 @@ extension String {
         return Array(utf8)
     }
 }
+#endif

@@ -11,7 +11,7 @@ var package = Package(
         Target(
             name: "TurnstileWeb",
             dependencies: [.Target(name: "Turnstile")]),
-    ],
+        ],
     dependencies: [
         .Package(url: "https://github.com/vapor/engine.git", majorVersion: 0, minor: 5),
         .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 4)
@@ -19,5 +19,5 @@ var package = Package(
 )
 
 #if os(Linux)
-package.dependencies.append(Dependency.Package(url: "https://github.com/czechboy0/SecretSocks.git", majorVersion: 0, minor: 5))
+package.dependencies.append(Package.Dependency.Package(url: "https://github.com/czechboy0/SecretSocks.git", majorVersion: 0, minor: 5))
 #endif
