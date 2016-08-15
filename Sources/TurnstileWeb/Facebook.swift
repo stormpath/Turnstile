@@ -72,6 +72,7 @@ public class Facebook: OAuth2, Realm {
 public struct FacebookAccount: Account, Credentials {
     // TODO: represent a lot more from the Facebook account.
     public let accountID: String
+    public let realm: Realm.Type = Facebook.self
 }
 
 /**

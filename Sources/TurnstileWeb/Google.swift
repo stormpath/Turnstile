@@ -64,6 +64,7 @@ public class Google: OAuth2, Realm {
  */
 public struct GoogleAccount: Account, Credentials {
     public let accountID: String
+    public let realm: Realm.Type = Google.self
 }
 
 /// TODO: refactor facebook and google to using this to an "unknown" OAuth error.

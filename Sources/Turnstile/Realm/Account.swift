@@ -10,4 +10,5 @@
 public protocol Account {
     /// The account ID
     var accountID: String { get }
+    var realm: Realm.Type { get } 
 }

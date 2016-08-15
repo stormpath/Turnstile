@@ -51,6 +51,7 @@ public class MemoryRealm: Realm {
  */
 private struct MemoryAccount: Account {
     private var accountID: String
+    private let realm: Realm.Type = MemoryRealm.self
     
     private init(id: String) {
         accountID = id
