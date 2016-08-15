@@ -57,6 +57,10 @@ public class Google: OAuth2, Realm {
         
         throw IncorrectCredentialsError()
     }
+    
+    public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> String {
+        return super.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
+    }
 }
 
 /**

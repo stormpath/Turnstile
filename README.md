@@ -53,6 +53,13 @@ SessionManager is a Turnstile component that manages sessions and persistience f
 
 ### Writing a SessionManager
 
+## Tests
+
+Tests are powered by XCTest. To successfully perform the Facebook Login tests, you must have the following environment variables set:
+
+* `FACEBOOK_CLIENT_ID` - the Facebook App ID for a test app from the [Facebook developer console](https://developers.facebook.com). 
+* `FACEBOOK_CLIENT_SECRET` - the Facebook App Secret for a test app from the [Facebook developer console](https://developers.facebook.com). 
+
 ## Contributing
 
 We're always open to contributions! Since this probject is fairly early stage, please join the [Stormpath slack channel](https://talkstormpath.shipit.xyz) to discuss how you can contribute!
