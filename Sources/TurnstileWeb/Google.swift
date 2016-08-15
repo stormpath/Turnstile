@@ -50,12 +50,8 @@ public class Google: OAuth2, Realm {
         guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
         guard let json = response.json else { throw InvalidAPIResponse() }
         
-        guard let responseData = json["data"]?.object else {
-            throw GoogleError(json: json)
-        }
-        
-        if let accountID = responseData["user_id"]?.string
-            , responseData["audience"]?.string?.components(separatedBy: "-")[0] == clientID.components(separatedBy: "-")[0] {
+        if let accountID = json["sub"]?.string
+            , json["aud"]?.string?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
             return GoogleAccount(accountID: accountID)
         }
         
