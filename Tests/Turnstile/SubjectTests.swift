@@ -1,9 +1,9 @@
 import XCTest
 @testable import Turnstile
 
-class UserTests: XCTestCase {
+class SubjectTests: XCTestCase {
     var turnstile: Turnstile!
-    var user: User!
+    var user: Subject!
     var realm: MemoryRealm!
     var sessionManager: MemorySessionManager!
     
@@ -15,11 +15,11 @@ class UserTests: XCTestCase {
         sessionManager = MemorySessionManager()
         realm = MemoryRealm()
         turnstile = Turnstile(sessionManager: sessionManager, realm: realm)
-        user = User(turnstile: turnstile)
+        user = Subject(turnstile: turnstile)
         _ = try? turnstile.realm.register(credentials: validCredentials)
     }
     
-    func testThatUserCanRegisterWithCredentials() {
+    func testThatSubjectCanRegisterWithCredentials() {
         let newCredentials = UsernamePassword(username: "Test", password: "Test")
         _ = try? user.register(credentials: newCredentials)
         
@@ -28,32 +28,32 @@ class UserTests: XCTestCase {
         XCTAssert(user.authenticated, "The user should be able to register")
     }
     
-    func testThatUserCanAuthenticate() {
+    func testThatSubjectCanAuthenticate() {
         _ = try? user.login(credentials: validCredentials)
         
         XCTAssert(user.authenticated, "The user should be authenticated")
     }
     
-    func testThatUserAuthenticationCanPersist() {
+    func testThatSubjectAuthenticationCanPersist() {
         _ = try? user.login(credentials: validCredentials, persist: true)
         guard let identifier = user.authDetails?.sessionID else {
             XCTFail("Session identifier must be set for the user.")
             return
         }
         
-        let persistedUser = try? turnstile.sessionManager.getUser(identifier: identifier)
+        let persistedSubject = try? turnstile.sessionManager.getSubject(identifier: identifier)
         
-        XCTAssert(persistedUser === user, "The user authentication should be persisted")
+        XCTAssert(persistedSubject === user, "The user authentication should be persisted")
     }
     
-    func testThatUserCanLogout() {
+    func testThatSubjectCanLogout() {
         _ = try? user.login(credentials: validCredentials)
         user.logout()
         
         XCTAssert(!user.authenticated, "The user should not be authenticated anymore")
     }
     
-    func testThatUserLogoutIsRemovedFromSession() {
+    func testThatSubjectLogoutIsRemovedFromSession() {
         _ = try? user.login(credentials: validCredentials, persist: true)
         guard let identifier = user.authDetails?.sessionID else {
             XCTFail("Session identifier must be set for the user.")
@@ -62,7 +62,7 @@ class UserTests: XCTestCase {
         user.logout()
         
         do {
-            _ = try turnstile.sessionManager.getUser(identifier: identifier)
+            _ = try turnstile.sessionManager.getSubject(identifier: identifier)
             XCTFail("The user should not be persisted")
         } catch {}
         
@@ -70,10 +70,10 @@ class UserTests: XCTestCase {
     }
     
     static var allTests = [
-        ("testThatUserCanRegisterWithCredentials", testThatUserCanRegisterWithCredentials),
-        ("testThatUserCanAuthenticate", testThatUserCanAuthenticate),
-        ("testThatUserAuthenticationCanPersist", testThatUserAuthenticationCanPersist),
-        ("testThatUserCanLogout", testThatUserCanLogout),
-        ("testThatUserLogoutIsRemovedFromSession", testThatUserLogoutIsRemovedFromSession)
+        ("testThatSubjectCanRegisterWithCredentials", testThatSubjectCanRegisterWithCredentials),
+        ("testThatSubjectCanAuthenticate", testThatSubjectCanAuthenticate),
+        ("testThatSubjectAuthenticationCanPersist", testThatSubjectAuthenticationCanPersist),
+        ("testThatSubjectCanLogout", testThatSubjectCanLogout),
+        ("testThatSubjectLogoutIsRemovedFromSession", testThatSubjectLogoutIsRemovedFromSession)
     ]
 }

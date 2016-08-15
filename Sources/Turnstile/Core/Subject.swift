@@ -1,5 +1,5 @@
 //
-//  User.swift
+//  Subject.swift
 //  Turnstile
 //
 //  Created by Edward Jiang on 7/26/16.
@@ -10,7 +10,7 @@
  The user represents the current operating user in Turnstile. This can be anonymous,
  or authenticated against a realm.
  */
-public class User {
+public class Subject {
     /// A reference to the Turnstile instance mapped to 
     private let turnstile: Turnstile
     
@@ -29,7 +29,7 @@ public class User {
     
     /** 
      Attempts to authenticate the user with the credentials presented. 
-     If persist = true, the User object is stored in the session manager, which
+     If persist = true, the Subject object is stored in the session manager, which
      sets the user's sessionID
      */
     public func login(credentials: Credentials, persist: Bool = false) throws {

@@ -14,14 +14,14 @@ import TurnstileCrypto
  */
 public class MemorySessionManager: SessionManager {
     /// Dictionary of sessions
-    private var sessions = [String: User]()
+    private var sessions = [String: Subject]()
     private let random: Random = URandom()
     
     /// Initializes the Session Manager. No config needed!
     public init() {}
     
     /// Gets the user for the current session identifier.
-    public func getUser(identifier: String) throws -> User {
+    public func getSubject(identifier: String) throws -> Subject {
         if let user = sessions[identifier] {
             return user
         } else {
@@ -29,8 +29,8 @@ public class MemorySessionManager: SessionManager {
         }
     }
     
-    /// Creates a session for a given User object and returns the identifier.
-    public func createSession(user: User) -> String {
+    /// Creates a session for a given Subject object and returns the identifier.
+    public func createSession(user: Subject) -> String {
         // TODO: Use a 128 bit session ID (base64/62 encoded) when Foundation works on Linux.
         // Not a priority right now since MemorySessionManager is not for production use.
         var identifier: String

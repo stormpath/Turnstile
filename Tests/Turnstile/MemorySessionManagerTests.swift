@@ -5,53 +5,53 @@ class MemorySessionManagerTests: XCTestCase {
     var sessionManager: MemorySessionManager!
     var turnstile: Turnstile!
     var realm: Realm!
-    var user: User!
+    var user: Subject!
     
     override func setUp() {
         sessionManager = MemorySessionManager()
         realm = MemoryRealm()
         turnstile = Turnstile(sessionManager: sessionManager, realm: realm)
         
-        user = User(turnstile: turnstile)
+        user = Subject(turnstile: turnstile)
     }
     
-    func testThatSessionManagerCanCreateSessionForUser() {
+    func testThatSessionManagerCanCreateSessionForSubject() {
         let sessionID = sessionManager.createSession(user: user)
-        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
+        let persistedSubject = try? sessionManager.getSubject(identifier: sessionID)
         
-        XCTAssert(persistedUser === user, "The user persisted should be the same")
+        XCTAssert(persistedSubject === user, "The user persisted should be the same")
     }
     
-    func testThatSessionManagerManagesMultipleUsers() {
-        let user2 = User(turnstile: turnstile)
+    func testThatSessionManagerManagesMultipleSubjects() {
+        let user2 = Subject(turnstile: turnstile)
         
         let sessionID = sessionManager.createSession(user: user)
         let sessionID2 = sessionManager.createSession(user: user2)
         
-        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
-        let persistedUser2 = try? sessionManager.getUser(identifier: sessionID2)
+        let persistedSubject = try? sessionManager.getSubject(identifier: sessionID)
+        let persistedSubject2 = try? sessionManager.getSubject(identifier: sessionID2)
         
         XCTAssertNotEqual(sessionID, sessionID2,
                           "Session IDs for two different users should not be the same")
-        XCTAssertNotNil(persistedUser, "The user should be persisted")
-        XCTAssertNotNil(persistedUser2, "The user should be persisted")
-        XCTAssert(persistedUser !== persistedUser2,
+        XCTAssertNotNil(persistedSubject, "The user should be persisted")
+        XCTAssertNotNil(persistedSubject2, "The user should be persisted")
+        XCTAssert(persistedSubject !== persistedSubject2,
                           "Persisted user objects should not be the same")
     }
     
     func testThatSessionManagerDeletesSession() {
         let sessionID = sessionManager.createSession(user: user)
         sessionManager.destroySession(identifier: sessionID)
-        let persistedUser = try? sessionManager.getUser(identifier: sessionID)
+        let persistedSubject = try? sessionManager.getSubject(identifier: sessionID)
         
-        XCTAssertNil(persistedUser, "The user should be deleted")
+        XCTAssertNil(persistedSubject, "The user should be deleted")
     }
     
     func testThatSessionManagerErrorsForUnknownSessions() {
         let unknownSessionID = "invalidSessionID"
         
         do {
-            try sessionManager.getUser(identifier: unknownSessionID)
+            try sessionManager.getSubject(identifier: unknownSessionID)
             XCTFail("An error should be thrown")
         } catch let error {
             XCTAssert(error is InvalidSessionError, "The error should be an invalid session")
@@ -59,8 +59,8 @@ class MemorySessionManagerTests: XCTestCase {
     }
     
     static var allTests = [
-        ("testThatSessionManagerCanCreateSessionForUser", testThatSessionManagerCanCreateSessionForUser),
-        ("testThatSessionManagerManagesMultipleUsers", testThatSessionManagerManagesMultipleUsers),
+        ("testThatSessionManagerCanCreateSessionForSubject", testThatSessionManagerCanCreateSessionForSubject),
+        ("testThatSessionManagerManagesMultipleSubjects", testThatSessionManagerManagesMultipleSubjects),
         ("testThatSessionManagerDeletesSession", testThatSessionManagerDeletesSession)
     ]
 }

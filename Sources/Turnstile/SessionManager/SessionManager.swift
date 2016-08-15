@@ -15,10 +15,10 @@ public protocol SessionManager {
     /**
      Gets the user for the current session identifier.
      */
-    func getUser(identifier: String) throws -> User
+    func getSubject(identifier: String) throws -> Subject
     
-    /// Creates a session for a given User object and returns the identifier.
-    func createSession(user: User) -> String
+    /// Creates a session for a given Subject object and returns the identifier.
+    func createSession(user: Subject) -> String
     
     /// Destroys the session for a session identifier.
     func destroySession(identifier: String)

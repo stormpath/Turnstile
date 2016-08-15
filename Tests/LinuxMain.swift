@@ -4,7 +4,7 @@ import XCTest
 @testable import TurnstileWebTestSuite
 
 XCTMain([
-     testCase(UserTests.allTests),
+     testCase(SubjectTests.allTests),
      testCase(MemoryRealmTests.allTests),
      testCase(MemorySessionManagerTests.allTests),
      testCase(URandomTests.allTests),
