@@ -69,19 +69,19 @@ class BCryptTests: XCTestCase {
     }
     
     func testBCryptGeneratesSalts() {
-        let salt = BCrypt.generateSalt()
-        let salt12 = BCrypt.generateSalt(rounds: 12)
+        let salt = BCryptSalt()
+        let salt12 = BCryptSalt(cost: 12)
         
-        XCTAssert(salt.hasPrefix("$2a$10"), "The prefix should be $2a (for BCrypt) and $10 (iterations)")
-        XCTAssertEqual(salt.characters.count, 29, "The salt should always be 29 characters")
+        XCTAssert(salt.string.hasPrefix("$2a$10"), "The prefix should be $2a (for BCrypt) and $10 (iterations)")
+        XCTAssertEqual(salt.string.characters.count, 29, "The salt should always be 29 characters")
         
-        XCTAssert(salt12.hasPrefix("$2a$12"), "The prefix should be $2a (for BCrypt) and $12 (iterations)")
-        XCTAssertEqual(salt12.characters.count, 29, "The salt should always be 29 characters")
+        XCTAssert(salt12.string.hasPrefix("$2a$12"), "The prefix should be $2a (for BCrypt) and $12 (iterations)")
+        XCTAssertEqual(salt12.string.characters.count, 29, "The salt should always be 29 characters")
     }
     
     func testBCryptHashesPasswordsProperly() throws {
         for test in tests {
-            XCTAssertEqual(try BCrypt.hash(password: test.0, withSalt: test.1), test.2, "The hashed password should match the precomputed hash")
+            XCTAssertEqual(try BCrypt.hash(password: test.0, salt: BCryptSalt(string: test.1)), test.2, "The hashed password should match the precomputed hash")
         }
     }
     

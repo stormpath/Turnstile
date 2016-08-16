@@ -332,85 +332,26 @@ public class BCrypt {
     private let slen: Int = 1024
     
     /**
-     Generates a BCrypt Salt with the specified number of rounds.
-      - returns: String    The generated salt.
-     */
-    public static func generateSalt(rounds: Int = 10) -> String {
-        let randomData: [Int8] = random.random(numBytes: 16).map({Int8(bitPattern: $0)})
-        
-        var salt : String
-        salt =  "$2a$" + ((rounds < 10) ? "0" : "") + "\(rounds)" + "$"
-        salt += BCrypt.Base64.encode(data: randomData, untilLength: UInt(randomData.count))
-        
-        return salt
-    }
-    
-    /**
      Hashes the password (using the UTF8 encoding) with the specified salt.
      */
-    public static func hash(password: String, withSalt salt: String = BCrypt.generateSalt()) throws -> String {
-        var bCrypt: BCrypt
-        var realSalt: String
-        var minor: Character = "\000"[0]
-        var off: Int = 0
+    public static func hash(password: String, salt: BCryptSalt = BCryptSalt()) -> String {
+        let bCrypt = BCrypt()
+        let minor: Character = salt.scheme.characters.count == 2 ? salt.scheme[1] : "\0"
         
-        // If the salt length is too short, it is invalid
-        if salt.characters.count < 16 {
-            throw BCryptError.invalidSaltLength(salt.characters.count)
-        }
-        
-        // If the salt does not start with "$2", it is an invalid version
-        if salt[0] != "$" || salt[1] != "2" {
-            throw BCryptError.invalidVersion("\(String(salt[0]))\(String(salt[1]))")
-        }
-        
-        if salt[2] == "$" {
-            off = 3
-        }
-        else {
-            off = 4
-            minor = salt[2]
-            if (minor != "y" && minor != "a" && minor != "b") || salt[3] != "$" {
-                // Invalid salt revision.
-                throw BCryptError.invalidSalt(salt)
-            }
-        }
-        
-        // Extract number of rounds
-        if salt[(Int)(off+2)] > "$" {
-            // Missing salt rounds
-            throw BCryptError.invalidSalt(salt)
-        }
-        
-        var range = Range(uncheckedBounds: (lower: off, upper: off + 2))
-        guard let extactedRounds = Int(salt[range]) else {
-            // Invalid number of rounds
-            throw BCryptError.invalidSalt(salt)
-        }
-        let rounds : Int = extactedRounds
-        
-        range = Range(uncheckedBounds: (lower: off + 3, upper: off + 25))
-        realSalt = salt[range]
-        
-        var passwordPreEncoding : String = password
+        var passwordPreEncoding = password
         if minor >= "a" {
             passwordPreEncoding += "\0"
         }
         
-        let passwordData: [Int8] = [UInt8](passwordPreEncoding.utf8).map {
-            Int8(bitPattern: $0)
-        }
+        let passwordData: [UInt8] = passwordPreEncoding.utf8.map {$0}
         
-        let saltData: [Int8] = Base64.decode(realSalt, untilLength: 16)
+        let hashedData = bCrypt.hash(password: passwordData, withSalt: salt)
         
-        bCrypt = BCrypt()
-        let hashedData = try bCrypt.hash(password: passwordData, withSalt: saltData, cost: rounds)
+        var hashedPassword = "$2" + ((minor >= "a") ? String(minor) : "") + "$"
         
-        var hashedPassword : String = "$2" + ((minor >= "a") ? String(minor) : "") + "$"
+        hashedPassword += ((salt.cost < 10) ? "0" : "") + "\(salt.cost)" + "$"
         
-        hashedPassword += ((rounds < 10) ? "0" : "") + "\(rounds)" + "$"
-        
-        let saltString = Base64.encode(data: saltData, untilLength: UInt(saltData.count))
+        let saltString = Base64.encode(data: salt.dataInt8, untilLength: UInt(salt.data.count))
         let hashedString = Base64.encode(data: hashedData, untilLength: 23)
         
         return hashedPassword + saltString + hashedString
@@ -420,7 +361,7 @@ public class BCrypt {
      Validates that the password matches the hash.
      */
     public static func verify(password: String, matchesHash hash: String) throws -> Bool {
-        return try BCrypt.hash(password: password, withSalt: hash) == hash
+        return try BCrypt.hash(password: password, salt: BCryptSalt(string: hash)) == hash
     }
     
     private static func streamToWordWithData(data: UnsafeMutablePointer<Int8>, ofLength length: Int, off offp: inout Int32) -> Int32 {
@@ -437,29 +378,20 @@ public class BCrypt {
         return word
     }
     
-    private func hash(password: [Int8], withSalt salt: [Int8], cost numberOfRounds: Int) throws -> [Int8] {
-        var rounds : Int
+    private func hash(password: [UInt8], withSalt salt: BCryptSalt) -> [Int8] {
+        let password = password.map { Int8(bitPattern: $0) }
         var j      : Int
         let clen   : Int = 6
         var cdata  : [Int32] = BCrypt.magicString
         
-        if numberOfRounds < 4 || numberOfRounds > 31 {
-            // Invalid number of rounds
-            throw BCryptError.invalidRounds(numberOfRounds)
-        }
-        
-        rounds = 1 << numberOfRounds
-        if salt.count != 16 {
-            // Invalid salt length
-            throw BCryptError.invalidSaltLength(salt.count)
-        }
-        
         self.initKey()
-        self.enhanceKeyScheduleWithData(data: salt, key: password)
+        self.enhanceKeyScheduleWithData(data: salt.dataInt8, key: password)
         
-        for _ in 0..<rounds{
+        let rounds = 1 << salt.cost
+        
+        for _ in 0..<rounds {
             self.key(key: password)
-            self.key(key: salt)
+            self.key(key: salt.dataInt8)
         }
         
         for _ in 0..<64 {
@@ -615,15 +547,70 @@ public class BCrypt {
     }
 }
 
-public enum BCryptError: Error, CustomStringConvertible {
-    case invalidRounds(Int)
-    case invalidSaltLength(Int)
-    case invalidVersion(String)
-    case invalidSalt(String)
+/** 
+ Represents a salt object used in BCrypt
+ */
+public struct BCryptSalt {
+    /// The MCF salt format. eg, 2, 2a, 2b
+    public let scheme: String
     
-    public var description: String {
-        return "BCrypt has encountered an error"
+    /// The cost factor for the BCrypt salt
+    public let cost: Int
+    
+    /// The raw salt data
+    public let data: [UInt8]
+    
+    // temp for while old code is still Int8
+    private var dataInt8: [Int8] {
+        return data.map({Int8(bitPattern: $0)})
     }
+    
+    /// String representation of the BCrypt Salt
+    public var string: String {
+        return "$\(scheme)$\(cost)$\(BCrypt.Base64.encode(data: dataInt8, untilLength: UInt(dataInt8.count)))"
+    }
+    
+    /**
+     Creates a new salt object from a salt string or BCrypt MCF hash. Throws BCryptError if it's an invalid salt.
+     */
+    public init(string: String) throws {
+        let saltParts = string.components(separatedBy: "$")
+        
+        // MCF is $<scheme>$<cost>$<salt><digest>, so 4 parts.
+        guard saltParts.count == 4 && saltParts[3].characters.count >= 16 else {
+            throw BCryptError()
+        }
+        
+        // If the salt does not start with "$2", it is an invalid version
+        guard ["2", "2a", "2b", "2y"].contains(saltParts[1]) else {
+            throw BCryptError()
+        }
+        self.scheme = saltParts[1]
+        
+        guard let rounds = Int(saltParts[2]) else {
+            throw BCryptError()
+        }
+        self.cost = rounds
+        
+        self.data = BCrypt.Base64.decode(saltParts[3], untilLength: 16).map({UInt8(bitPattern: $0)})
+    }
+    
+    /**
+     Creates a new random salt with the specified cost factor. Default cost factor of 10, which is probably
+     ~100 ms to hash a password on a modern CPU.
+     */
+    public init(cost: Int = 10) {
+        self.scheme = "2a"
+        self.cost = cost
+        self.data = URandom().random(numBytes: 16)
+    }
+}
+
+/**
+ BCrypt Error generated from parsing a bad BCrypt hash or salt.
+ */
+public struct BCryptError: Error, CustomStringConvertible {
+    public let description = "Invalid Hash or Salt"
 }
 
 private extension String {

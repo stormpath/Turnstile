@@ -22,9 +22,7 @@ public struct IncorrectCredentialsError: CredentialsError {
     public init() {}
     
     /// User-presentable error message
-    public var description: String {
-        return "Invalid Credentials"
-    }
+    public let description = "Invalid Credentials"
 }
 
 /**
@@ -36,9 +34,7 @@ public struct UnsupportedCredentialsError: CredentialsError {
     public init() {}
     
     /// User-presentable error message
-    public var description: String {
-        return "Unsupported Credentials"
-    }
+    public let description = "Unsupported Credentials"
 }
 
 /**
@@ -50,7 +46,5 @@ public struct AccountTakenError: CredentialsError {
     public init() {}
     
     /// User-presentable error message
-    public var description: String {
-        return "The account is already registered."
-    }
+    public let description = "The account is already registered."
 }
