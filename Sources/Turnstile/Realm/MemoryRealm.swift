@@ -49,11 +49,11 @@ public class MemoryRealm: Realm {
 /**
  Account object representing an account in the MemoryRealm.
  */
-private struct MemoryAccount: Account {
-    private var accountID: String
-    private let realm: Realm.Type = MemoryRealm.self
+fileprivate struct MemoryAccount: Account {
+    fileprivate var accountID: String
+    fileprivate let realm: Realm.Type = MemoryRealm.self
     
-    private init(id: String) {
+    fileprivate init(id: String) {
         accountID = id
     }
 }

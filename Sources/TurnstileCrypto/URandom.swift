@@ -55,8 +55,7 @@ public class URandom: Random {
     /// Get a random int16
     public var int16: Int16 {
         let bytes = read(numBytes: 2)
-        let pointer = UnsafeMutablePointer<Int16>(bytes)
-        return pointer.pointee
+        return UnsafeMutableRawPointer(mutating: bytes).assumingMemoryBound(to: Int16.self).pointee
     }
     
     /// Get a random uint16
@@ -67,8 +66,7 @@ public class URandom: Random {
     /// Get a random int32
     public var int32: Int32 {
         let bytes = read(numBytes: 4)
-        let pointer = UnsafeMutablePointer<Int32>(bytes)
-        return pointer.pointee
+        return UnsafeMutableRawPointer(mutating: bytes).assumingMemoryBound(to: Int32.self).pointee
     }
     
     /// Get a random uint32
@@ -79,8 +77,7 @@ public class URandom: Random {
     /// Get a random int64
     public var int64: Int64 {
         let bytes = read(numBytes: 8)
-        let pointer = UnsafeMutablePointer<Int64>(bytes)
-        return pointer.pointee
+        return UnsafeMutableRawPointer(mutating: bytes).assumingMemoryBound(to: Int64.self).pointee
     }
     
     /// Get a random uint64
@@ -90,9 +87,8 @@ public class URandom: Random {
     
     /// Get a random int
     public var int: Int {
-        let bytes = read(numBytes: sizeof(Int.self))
-        let pointer = UnsafeMutablePointer<Int>(bytes)
-        return pointer.pointee
+        let bytes = read(numBytes: MemoryLayout<Int>.size)
+        return UnsafeMutableRawPointer(mutating: bytes).assumingMemoryBound(to: Int.self).pointee
     }
     
     /// Get a random uint

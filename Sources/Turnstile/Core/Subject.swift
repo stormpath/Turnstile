@@ -35,7 +35,7 @@ public class Subject {
     public func login(credentials: Credentials, persist: Bool = false) throws {
         let account = try turnstile.realm.authenticate(credentials: credentials)
         let sessionID: String? = persist ? turnstile.sessionManager.createSession(user: self) : nil
-        let credentialType = credentials.dynamicType
+        let credentialType = type(of: credentials)
         
         authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: credentialType)
     }

@@ -455,11 +455,11 @@ public class BCrypt {
     private func initKey() {
         // p = P_orig
         p = UnsafeMutablePointer<Int32>.allocate(capacity: BCrypt.P_orig.count)
-        p.initialize(from: UnsafeMutablePointer<Int32>(BCrypt.P_orig), count: BCrypt.P_orig.count)
+        p.initialize(from: UnsafeMutableRawPointer(mutating: BCrypt.P_orig).assumingMemoryBound(to: Int32.self), count: BCrypt.P_orig.count)
         
         // s = S_orig
         s = UnsafeMutablePointer<Int32>.allocate(capacity: BCrypt.S_orig.count)
-        s.initialize(from: UnsafeMutablePointer<Int32>(BCrypt.S_orig), count: BCrypt.S_orig.count)
+        s.initialize(from: UnsafeMutableRawPointer(mutating: BCrypt.S_orig).assumingMemoryBound(to: Int32.self), count: BCrypt.S_orig.count)
     }
     
     private func deinitKey() {
@@ -478,7 +478,7 @@ public class BCrypt {
         let plen  : Int = 18
         let slen  : Int = 1024
         
-        let keyPointer : UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(key)
+        let keyPointer : UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(mutating: key)
         let keyLength : Int = key.count
         
         for i in 0..<plen {
@@ -512,9 +512,9 @@ public class BCrypt {
         
         
         
-        let keyPointer: UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(key)
+        let keyPointer: UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(mutating: key)
         let keyLength: Int = key.count
-        let dataPointer: UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(data)
+        let dataPointer: UnsafeMutablePointer<Int8> = UnsafeMutablePointer<Int8>(mutating: data)
         let dataLength: Int = data.count
         
         for i in 0..<plen {
@@ -561,7 +561,7 @@ public struct BCryptSalt {
     public let data: [UInt8]
     
     // temp for while old code is still Int8
-    private var dataInt8: [Int8] {
+    fileprivate var dataInt8: [Int8] {
         return data.map({Int8(bitPattern: $0)})
     }
     

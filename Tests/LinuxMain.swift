@@ -1,7 +1,7 @@
 import XCTest
-@testable import TurnstileTestSuite
-@testable import TurnstileCryptoTestSuite
-@testable import TurnstileWebTestSuite
+@testable import TurnstileTests
+@testable import TurnstileCryptoTests
+@testable import TurnstileWebTests
 
 XCTMain([
      testCase(SubjectTests.allTests),
