@@ -8,14 +8,7 @@ var package = Package(
             dependencies: [.Target(name: "TurnstileCrypto")]),
         Target(
             name: "TurnstileCrypto"),
-        Target(
-            name: "TurnstileWeb",
-            dependencies: [.Target(name: "Turnstile")]),
-        ],
-    dependencies: [
-        .Package(url: "https://github.com/vapor/engine.git", majorVersion: 0, minor: 5),
-        .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 4)
-    ]
+        ]
 )
 
 #if os(Linux)
