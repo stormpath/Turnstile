@@ -14,23 +14,15 @@ import JSON
 import Turnstile
 import Foundation
 import Transport
+import URI
 
 class FacebookTests: XCTestCase {
     var facebook: Facebook!
-    #if os(Linux)
-    let HTTPClient = Client<TLSClientStream>.self
-    #else
-    let HTTPClient = Client<FoundationStream>.self
-    #endif
+    let HTTPClient = BasicClient.self
     
     override func setUp() {
-        #if os(OSX) || os(iOS)
-            let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
-            let clientSecret = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_SECRET"] ?? ""
-        #elseif os(Linux)
-            let clientID = ProcessInfo.processInfo().environment["FACEBOOK_CLIENT_ID"] ?? ""
-            let clientSecret = ProcessInfo.processInfo().environment["FACEBOOK_CLIENT_SECRET"] ?? ""
-        #endif
+        let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
+        let clientSecret = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_SECRET"] ?? ""
         
         facebook = Facebook(clientID: clientID, clientSecret: clientSecret)
     }

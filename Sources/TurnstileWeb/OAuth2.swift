@@ -33,11 +33,7 @@ public class OAuth2 {
     /// The Token Endpoint of the OAuth 2 Server
     public let tokenURL: String
     
-    #if os(Linux)
-    let HTTPClient = Client<TLSClientStream>.self
-    #else
-    let HTTPClient = Client<FoundationStream>.self
-    #endif
+    let HTTPClient = BasicClient.self
     
     
     /// Creates the OAuth 2 client

@@ -10,6 +10,5 @@ XCTMain([
      testCase(URandomTests.allTests),
      testCase(BCryptTests.allTests),
      testCase(FacebookTests.allTests),
-     testCase(OAuth2Tests.allTests),
-     testCase(TLSClientStreamTests.allTests)
+     testCase(OAuth2Tests.allTests)
 ])

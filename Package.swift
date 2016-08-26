@@ -17,7 +17,3 @@ var package = Package(
         .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 5)
     ]
 )
-
-#if os(Linux)
-package.dependencies.append(Package.Dependency.Package(url: "https://github.com/czechboy0/SecretSocks.git", majorVersion: 0, minor: 6))
-#endif
