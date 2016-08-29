@@ -44,6 +44,14 @@ public class MemoryRealm: Realm {
         users[credentials.username] = credentials.password
         return MemoryAccount(id: credentials.username)
     }
+    
+    public func getAccount(byID identifier: String) throws -> Account {
+        guard users[identifier] != nil else {
+            throw IncorrectCredentialsError()
+        }
+        
+        return MemoryAccount(id: identifier)
+    }
 }
 
 /**

@@ -23,8 +23,13 @@ public class Subject {
     }
     
     /// Initializes a new user and binds it to the turnstile instance.
-    public init(turnstile: Turnstile) {
+    /// If a sessionID is provided, attempts to restore from the Session
+    public init(turnstile: Turnstile, sessionID: String? = nil) {
         self.turnstile = turnstile
+        
+        if let sessionID = sessionID {
+            try? restore(fromSessionID: sessionID)
+        }
     }
     
     /** 
@@ -34,7 +39,7 @@ public class Subject {
      */
     public func login(credentials: Credentials, persist: Bool = false) throws {
         let account = try turnstile.realm.authenticate(credentials: credentials)
-        let sessionID: String? = persist ? turnstile.sessionManager.createSession(user: self) : nil
+        let sessionID: String? = persist ? turnstile.sessionManager.createSession(subject: self) : nil
         let credentialType = type(of: credentials)
         
         authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: credentialType)
@@ -51,6 +56,13 @@ public class Subject {
             turnstile.sessionManager.destroySession(identifier: sessionIdentifier)
         }
         authDetails = nil
+    }
+    
+    private func restore(fromSessionID sessionID: String) throws {
+        let accountID = try turnstile.sessionManager.getAccountID(fromSessionID: sessionID)
+        let account = try turnstile.realm.getAccount(byID: accountID)
+        
+        authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: Sesssion.self)
     }
 }
 

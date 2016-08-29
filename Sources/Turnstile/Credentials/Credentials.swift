@@ -12,3 +12,5 @@
  or open a GitHub issue or Pull Request to represent another type of credentials. 
  */
 public protocol Credentials { }
+
+public struct Sesssion: Credentials {}

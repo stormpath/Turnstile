@@ -33,6 +33,11 @@ public protocol Realm {
      username/password stores, or Facebook accounts, for instance.
      */
     func register(credentials: Credentials) throws -> Account
+    
+    /**
+     
+     */
+    func getAccount(byID identifier: String) throws -> Account
 }
 
 public extension Realm {
