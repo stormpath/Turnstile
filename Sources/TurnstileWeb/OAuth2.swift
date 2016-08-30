@@ -33,7 +33,7 @@ public class OAuth2 {
     /// The Token Endpoint of the OAuth 2 Server
     public let tokenURL: String
     
-    let HTTPClient = BasicClient.self
+    let HTTPClient = TempHTTPClient()
     
     
     /// Creates the OAuth 2 client

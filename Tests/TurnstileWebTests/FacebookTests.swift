@@ -18,7 +18,7 @@ import URI
 
 class FacebookTests: XCTestCase {
     var facebook: Facebook!
-    let HTTPClient = BasicClient.self
+    let HTTPClient = TempHTTPClient()
     
     override func setUp() {
         let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
