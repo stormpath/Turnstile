@@ -39,7 +39,7 @@ public class Subject {
      */
     public func login(credentials: Credentials, persist: Bool = false) throws {
         let account = try turnstile.realm.authenticate(credentials: credentials)
-        let sessionID: String? = persist ? turnstile.sessionManager.createSession(subject: self) : nil
+        let sessionID: String? = persist ? turnstile.sessionManager.createSession(account: account) : nil
         let credentialType = type(of: credentials)
         
         authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: credentialType)
@@ -59,8 +59,7 @@ public class Subject {
     }
     
     private func restore(fromSessionID sessionID: String) throws {
-        let accountID = try turnstile.sessionManager.getAccountID(fromSessionID: sessionID)
-        let account = try turnstile.realm.getAccount(byID: accountID)
+        let account = try turnstile.sessionManager.restoreAccount(fromSessionID: sessionID)
         
         authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: Sesssion.self)
     }

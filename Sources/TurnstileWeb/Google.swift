@@ -17,6 +17,7 @@ import JSON
  Google allows you to authenticate against Google for login purposes.
  */
 public class Google: OAuth2, Realm {
+
     /**
      Create a Google object. Uses the Client ID and Client Secret from the
      Google Developers Console.
@@ -52,7 +53,7 @@ public class Google: OAuth2, Realm {
         
         if let accountID = json["sub"]?.string
             , json["aud"]?.string?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
-            return GoogleAccount(accountID: accountID)
+            return GoogleAccount(uniqueID: accountID)
         }
         
         throw IncorrectCredentialsError()
@@ -67,8 +68,7 @@ public class Google: OAuth2, Realm {
  A Google account
  */
 public struct GoogleAccount: Account, Credentials {
-    public let accountID: String
-    public let realm: Realm.Type = Google.self
+    public let uniqueID: String
 }
 
 /// TODO: refactor facebook and google to using this to an "unknown" OAuth error.

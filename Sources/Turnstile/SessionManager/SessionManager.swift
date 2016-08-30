@@ -15,10 +15,10 @@ public protocol SessionManager {
     /**
      Gets the account ID for the current session identifier.
      */
-    func getAccountID(fromSessionID identifier: String) throws -> String
+    func restoreAccount(fromSessionID identifier: String) throws -> Account
     
-    /// Creates a session for a given Subject object and returns the identifier.
-    func createSession(subject: Subject) -> String
+    /// Creates a session for a given Account object and returns the identifier.
+    func createSession(account: Account) -> String
     
     /// Destroys the session for a session identifier.
     func destroySession(identifier: String)
@@ -31,4 +31,17 @@ public struct InvalidSessionError: TurnstileError {
     public let description = "Invalid session ID"
     
     public init() {}
+}
+
+/**
+ Represents a generic account that is stored in a session, using a SessionID.
+ Accounts in Sessions usually will not be the full account, as that requires
+ a database call.
+ */
+public struct SessionAccount: Account {
+    public let uniqueID: String
+    
+    public init(uniqueID: String) {
+        self.uniqueID = uniqueID
+    }
 }

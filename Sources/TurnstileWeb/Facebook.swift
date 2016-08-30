@@ -53,7 +53,7 @@ public class Facebook: OAuth2, Realm {
 
         if let accountID = responseData["user_id"]?.string
             , responseData["app_id"]?.string == clientID && responseData["is_valid"]?.bool == true {
-            return FacebookAccount(accountID: accountID)
+            return FacebookAccount(uniqueID: accountID)
         }
         
         throw IncorrectCredentialsError()
@@ -71,8 +71,7 @@ public class Facebook: OAuth2, Realm {
  */
 public struct FacebookAccount: Account, Credentials {
     // TODO: represent a lot more from the Facebook account.
-    public let accountID: String
-    public let realm: Realm.Type = Facebook.self
+    public let uniqueID: String
 }
 
 /**
