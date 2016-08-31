@@ -23,8 +23,8 @@ public class Google: OAuth2, Realm {
      Google Developers Console.
      */
     public init(clientID: String, clientSecret: String) {
-        let tokenURL = "https://www.googleapis.com/oauth2/v4/token"
-        let authorizationURL = "https://accounts.google.com/o/oauth2/auth"
+        let tokenURL = URL(string: "https://www.googleapis.com/oauth2/v4/token")!
+        let authorizationURL = URL(string: "https://accounts.google.com/o/oauth2/auth")!
         super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
     }
     
@@ -59,7 +59,7 @@ public class Google: OAuth2, Realm {
         throw IncorrectCredentialsError()
     }
     
-    public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> String {
+    public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> URL {
         return super.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
     }
 }
