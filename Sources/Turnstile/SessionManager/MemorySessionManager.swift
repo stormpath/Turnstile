@@ -23,13 +23,14 @@ public class MemorySessionManager: SessionManager {
     
     /// Creates a session for a given Subject object and returns the identifier.
     public func createSession(account: Account) -> String {
-        // TODO: Use a 128 bit session ID (base64/62 encoded) when Foundation works on Linux.
-        // Not a priority right now since MemorySessionManager is not for production use.
         var identifier: String
         
         // Create new random identifiers and find an unused one.
         repeat {
             identifier = Data(bytes: random.random(numBytes: 16)).base64EncodedString()
+            identifier = identifier.replacingOccurrences(of: "=", with: "")
+            identifier = identifier.replacingOccurrences(of: "+", with: "-")
+            identifier = identifier.replacingOccurrences(of: "/", with: "_")
         } while sessions[identifier] != nil
         
         sessions[identifier] = account.uniqueID
