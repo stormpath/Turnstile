@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Dispatch
 
 extension URLSession {
     func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?) {
