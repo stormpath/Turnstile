@@ -28,16 +28,16 @@ public class OAuth2 {
     public let clientSecret: String
     
     /// The Authorization Endpoint of the OAuth 2 Server
-    public let authorizationURL: String
+    public let authorizationURL: URL
     
     /// The Token Endpoint of the OAuth 2 Server
-    public let tokenURL: String
+    public let tokenURL: URL
     
     let HTTPClient = TempHTTPClient()
     
     
     /// Creates the OAuth 2 client
-    public init(clientID: String, clientSecret: String, authorizationURL: String, tokenURL: String) {
+    public init(clientID: String, clientSecret: String, authorizationURL: URL, tokenURL: URL) {
         self.clientID = clientID
         self.clientSecret = clientSecret
         self.authorizationURL = authorizationURL
@@ -51,17 +51,21 @@ public class OAuth2 {
     ///     You will need to configure this in the admin console for the OAuth provider's site.
     /// - parameter state:       A randomly generated string to prevent CSRF attacks. 
     ///     Verify this when validating the Authorization Code
-    /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant.
-    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> String {
-        // TODO: serialize these better
-        var loginLink = authorizationURL + "?"
-        loginLink += "response_type=code"
-        loginLink += "&client_id=" + clientID
-        loginLink += "&redirect_uri=" + redirectURL
-        loginLink += "&state=" + state
-        loginLink += "&scope=" + scopes.joined(separator: "%20")
+    /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant
+    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> URL {
+        let queryItems = ["response_type": "code",
+                          "client_id": clientID,
+                          "redirect_uri": redirectURL,
+                          "state": state,
+                          "scope": scopes.joined(separator: " ")]
+        var urlComponents = URLComponents(url: authorizationURL, resolvingAgainstBaseURL: false)
+        urlComponents?.setQueryItems(dict: queryItems)
         
-        return loginLink
+        if let result = urlComponents?.url {
+            return result
+        } else {
+            preconditionFailure() // TODO: replace with a better error
+        }
     }
     
     
@@ -70,10 +74,18 @@ public class OAuth2 {
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     public func exchange(authorizationCode: AuthorizationCode) throws -> OAuth2Token {
-        // TODO: serialize these better
-        let url = tokenURL + "?grant_type=authorization_code&client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
-        let request = try! Request(method: .post, uri: url)
+        let queryItems = ["client_id": clientID,
+                          "client_secret": clientSecret,
+                          "redirect_uri": authorizationCode.redirectURL,
+                          "code": authorizationCode.code]
+        var urlComponents = URLComponents(url: tokenURL, resolvingAgainstBaseURL: false)
+        urlComponents?.setQueryItems(dict: queryItems)
         
+        guard let url = urlComponents?.url else {
+            preconditionFailure() // TODO: replace with a better error
+        }
+        
+        let request = try Request(method: .get, url: url)
         request.headers["Accept"] = "application/json"
         
         guard let response = try? HTTPClient.respond(to: request) else {
@@ -137,5 +149,17 @@ private extension URI {
             }
         }
         return result
+    }
+}
+
+extension Request {
+    convenience init(method: HTTP.Method, url: URL) throws {
+        try self.init(method: method, uri: url.absoluteString)
+    }
+}
+
+extension URLComponents {
+    mutating func setQueryItems(dict: [String: String]) {
+        self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
     }
 }
