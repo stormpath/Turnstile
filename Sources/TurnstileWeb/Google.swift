@@ -8,8 +8,6 @@
 
 import Foundation
 import Turnstile
-import HTTP
-import JSON
 
 // TODO: split out some of this logic into an OpenID Connect framework. 
 
@@ -44,15 +42,20 @@ public class Google: OAuth2, Realm {
      Authenticates a Google access token.
      */
     public func authenticate(credentials: AccessToken) throws -> GoogleAccount {
-        let url = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string
-        let request = try! Request(method: .get, uri: url)
-        request.headers["Accept"] = "application/json"
+        let url = URL(string: "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string)!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
-        guard let json = response.json else { throw InvalidAPIResponse() }
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
+            throw APIConnectionError()
+        }
         
-        if let accountID = json["sub"]?.string
-            , json["aud"]?.string?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+            throw InvalidAPIResponse()
+        }
+        
+        if let accountID = json["sub"] as? String
+            , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
             return GoogleAccount(uniqueID: accountID)
         }
         
@@ -76,6 +79,6 @@ public struct GoogleError: TurnstileError {
     public let description: String
     
     public init(json: JSON) {
-        description = json["error"]?["message"]?.string ?? "Unknown Google Login Error"
+        description = json["error"]?["message"] as? String ?? "Unknown Google Login Error"
     }
 }

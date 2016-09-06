@@ -8,10 +8,6 @@
 
 import Turnstile
 import Foundation
-import HTTP
-import JSON
-import URI
-import Transport
 
 /**
  OAuth 2 represents the base API Client for an OAuth 2 server that implements the
@@ -33,7 +29,9 @@ public class OAuth2 {
     /// The Token Endpoint of the OAuth 2 Server
     public let tokenURL: URL
     
-    let HTTPClient = TempHTTPClient()
+    var urlSession: URLSession {
+        return URLSession(configuration: URLSessionConfiguration.ephemeral)
+    }
     
     
     /// Creates the OAuth 2 client
@@ -85,15 +83,16 @@ public class OAuth2 {
             preconditionFailure() // TODO: replace with a better error
         }
         
-        let request = try Request(method: .get, url: url)
-        request.headers["Accept"] = "application/json"
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        guard let response = try? HTTPClient.respond(to: request) else {
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
             throw APIConnectionError()
         }
-        guard let json = response.json else {
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
             throw InvalidAPIResponse()
         }
+        
         guard let token = OAuth2Token(json: json) else {
             // Facebook doesn't do this error properly... probably have to override this
             if let error = OAuth2Error(json: json) {

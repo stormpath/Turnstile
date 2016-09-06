@@ -8,8 +8,6 @@
 
 import Foundation
 import Turnstile
-import HTTP
-import JSON
 
 /**
  Facebook allows you to authenticate against Facebook for login purposes.
@@ -46,20 +44,25 @@ public class Facebook: OAuth2, Realm {
                                            "access_token": appAccessToken])
         
         guard let url = urlComponents.url else {
-            throw FacebookError(json: JSON([]))
+            throw FacebookError(json: [String: Any]())
         }
-        let request = try! Request(method: .get, url: url)
-        request.headers["Accept"] = "application/json"
         
-        guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
-        guard let json = response.json else { throw InvalidAPIResponse() }
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        guard let responseData = json["data"]?.object else {
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
+            throw APIConnectionError()
+        }
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+            throw InvalidAPIResponse()
+        }
+        
+        guard let responseData = json["data"] as? [String: Any] else {
             throw FacebookError(json: json)
         }
 
-        if let accountID = responseData["user_id"]?.string
-            , responseData["app_id"]?.string == clientID && responseData["is_valid"]?.bool == true {
+        if let accountID = responseData["user_id"] as? String
+            , responseData["app_id"] as? String == clientID && responseData["is_valid"] as? Bool == true {
             return FacebookAccount(uniqueID: accountID)
         }
         
@@ -89,7 +92,7 @@ public struct FacebookError: TurnstileError {
     public let description: String
     
     /// Initializer
-    public init(json: JSON) {
-        description = json["error"]?["message"]?.string ?? "Unknown Facebook Login Error"
+    public init(json: [String: Any]) {
+        description = (json["error"] as? [String: Any])?["message"] as? String ?? "Unknown Facebook Login Error"
     }
 }

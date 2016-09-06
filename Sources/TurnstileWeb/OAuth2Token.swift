@@ -8,7 +8,6 @@
 
 import Foundation
 import Turnstile
-import JSON
 
 /**
  Represents an OAuth 2 Token
@@ -28,13 +27,15 @@ public class OAuth2Token {
         self.scope = scope
     }
     
-    public convenience init?(json: JSON) {
-        guard let accessToken = json["access_token"]?.string, let tokenType = json["token_type"]?.string else {
+    public convenience init?(json: [String: Any]) {
+        guard let accessToken = json["access_token"] as? String,
+            let tokenType = json["token_type"] as? String else {
             return nil
         }
-        let expiresIn = json["expires_in"]?.int
-        let refreshToken: Token? = json["refresh_token"]?.string == nil ? nil : json["refresh_token"]!.string!
-        let scope = json["scope"]?.string?.components(separatedBy: " ")
+        
+        let expiresIn = json["expires_in"] as? Int
+        let refreshToken: Token? = json["refresh_token"] as? String
+        let scope = (json["scope"] as? String)?.components(separatedBy: " ")
         self.init(accessToken: AccessToken(string: accessToken), tokenType: tokenType, expiresIn: expiresIn, refreshToken: refreshToken, scope: scope)
     }
 }

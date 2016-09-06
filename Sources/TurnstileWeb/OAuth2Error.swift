@@ -7,7 +7,6 @@
 //
 
 import Turnstile
-import JSON
 
 /**
  An OAuth 2 error is an error recieved from an OAuth 2 server.
@@ -27,12 +26,12 @@ public struct OAuth2Error: TurnstileError {
     }
     
     /// Convenience initializer from JSON
-    init?(json: JSON) {
-        guard let errorCode = json["error"]?.string,
+    init?(json: [String: Any]) {
+        guard let errorCode = json["error"] as? String,
               let code = OAuth2ErrorCode(rawValue: errorCode) else {
                 return nil
         }
-        self.init(code: code, description: json["error_description"]?.string, uri: json["error_uri"]?.string)
+        self.init(code: code, description: json["error_description"] as? String, uri: json["error_uri"] as? String)
     }
     
     /// Convenience initializer from a dictionary representing the JSON or URL parameters
