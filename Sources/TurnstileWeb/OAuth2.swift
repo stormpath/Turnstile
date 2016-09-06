@@ -110,7 +110,8 @@ public class OAuth2 {
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     /// - throws: OAuth2Error() if the oauth server calls back with an error
     public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
-        guard let uri = try? URI(url), let query = uri.queryDictionary else { throw InvalidAPIResponse() }
+        guard let urlComponents = URLComponents(string: url),
+            let query = urlComponents.queryDictionary else { throw InvalidAPIResponse() }
         
         guard let code = query["code"], query["state"] == state else {
             throw OAuth2Error(dict: query) ?? InvalidAPIResponse()
@@ -135,25 +136,14 @@ public extension Realm where Self: OAuth2 {
     }
 }
 
-private extension URI {
+extension URLComponents {
     var queryDictionary: [String: String]? {
-        guard let queryComponents = self.query?.components(separatedBy: "&") else { return nil }
-        
-        var result = [String: String]()
-        for component in queryComponents {
-            let pair = component.components(separatedBy: "=")
-            
-            if pair.count == 2 {
-                result[pair[0]] = pair[1]
-            }
+        guard let queryItems = queryItems else { return nil }
+        var dictionary = [String: String]()
+        for queryItem in queryItems {
+            dictionary[queryItem.name] = queryItem.value
         }
-        return result
-    }
-}
-
-extension Request {
-    convenience init(method: HTTP.Method, url: URL) throws {
-        try self.init(method: method, uri: url.absoluteString)
+        return dictionary
     }
 }
 

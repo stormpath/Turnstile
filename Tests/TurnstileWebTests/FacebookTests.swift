@@ -9,16 +9,11 @@
 @testable import TurnstileWeb
 import XCTest
 
-import HTTP
-import JSON
 import Turnstile
 import Foundation
-import Transport
-import URI
 
 class FacebookTests: XCTestCase {
     var facebook: Facebook!
-    let HTTPClient = TempHTTPClient()
     
     override func setUp() {
         let clientID = ProcessInfo.processInfo.environment["FACEBOOK_CLIENT_ID"] ?? ""
@@ -48,15 +43,24 @@ class FacebookTests: XCTestCase {
     
     // Uses the FB graph API to create a test account and get its access token.
     private func createFacebookAccessToken() -> AccessToken? {
-        let url = "https://graph.facebook.com/\(facebook.clientID)/accounts/test-users?access_token=\(appAccessToken)"
-        let request = try! Request(method: .post, uri: url)
-        request.headers["Accept"] = "application/json"
+        let url = URL(string: "https://graph.facebook.com/\(facebook.clientID)/accounts/test-users?access_token=\(appAccessToken)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        guard let response = try? HTTPClient.respond(to: request) else {
+        let urlSession = URLSession(configuration: URLSessionConfiguration.ephemeral)
+        
+        guard let response = (try? urlSession.executeRequest(request: request))?.0 else {
             XCTFail("Could not connect to Facebook")
             return nil
         }
-        return AccessToken(facebookResponse: response)
+        
+        guard let responseJSON = (try? JSONSerialization.jsonObject(with: response, options: [])) as? [String: Any] else {
+            XCTFail("Invalid Facebook response")
+            return nil
+        }
+        
+        return AccessToken(facebookResponse: responseJSON)
     }
     
     private var appAccessToken: String {
@@ -70,12 +74,11 @@ class FacebookTests: XCTestCase {
 }
 
 extension AccessToken {
-    convenience init?(facebookResponse response: Response) {
-        guard let accessToken = response.json?["access_token"]?.string else {
+    convenience init?(facebookResponse json: [String: Any]) {
+        guard let accessToken = json["access_token"] as? String else {
             return nil
         }
         
         self.init(string: accessToken)
     }
 }
-

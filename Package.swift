@@ -11,9 +11,5 @@ var package = Package(
         Target(
             name: "TurnstileWeb",
             dependencies: [.Target(name: "Turnstile")]),
-        ],
-    dependencies: [
-        .Package(url: "https://github.com/vapor/engine.git", majorVersion: 0, minor: 9),
-        .Package(url: "https://github.com/vapor/json.git", majorVersion: 0, minor: 7)
-    ]
+        ]
 )

@@ -78,7 +78,7 @@ public struct GoogleAccount: Account, Credentials {
 public struct GoogleError: TurnstileError {
     public let description: String
     
-    public init(json: JSON) {
-        description = json["error"]?["message"] as? String ?? "Unknown Google Login Error"
+    public init(json: [String: Any]) {
+        description = (json["error"] as? [String: Any])?["message"] as? String ?? "Unknown Google Login Error"
     }
 }
