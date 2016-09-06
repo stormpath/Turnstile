@@ -6,7 +6,6 @@
 //
 //
 
-import Foundation
 import Turnstile
 import HTTP
 import JSON
@@ -20,8 +19,8 @@ public class Facebook: OAuth2, Realm {
      Facebook Developers Console.
      */
     public init(clientID: String, clientSecret: String) {
-        let tokenURL = URL(string: "https://graph.facebook.com/v2.3/oauth/access_token")!
-        let authorizationURL = URL(string: "https://www.facebook.com/dialog/oauth")!
+        let tokenURL = "https://graph.facebook.com/v2.3/oauth/access_token"
+        let authorizationURL = "https://www.facebook.com/dialog/oauth"
         super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
     }
     
@@ -41,14 +40,8 @@ public class Facebook: OAuth2, Realm {
      Authenticates a Facebook access token.
      */
     public func authenticate(credentials: AccessToken) throws -> FacebookAccount {
-        var urlComponents = URLComponents(string: "https://graph.facebook.com/debug_token")!
-        urlComponents.setQueryItems(dict: ["input_token": credentials.string,
-                                           "access_token": appAccessToken])
-        
-        guard let url = urlComponents.url else {
-            throw FacebookError(json: JSON([]))
-        }
-        let request = try! Request(method: .get, url: url)
+        let url = "https://graph.facebook.com/debug_token?input_token=" + credentials.string + "&access_token=" + appAccessToken
+        let request = try! Request(method: .get, uri: url)
         request.headers["Accept"] = "application/json"
         
         guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
