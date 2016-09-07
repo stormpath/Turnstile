@@ -150,5 +150,10 @@ extension URLComponents {
 extension URLComponents {
     mutating func setQueryItems(dict: [String: String]) {
         self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
+        
+        // Hack for linux because of https://bugs.swift.org/browse/SR-2570
+        if queryItems == nil {
+            self.queryItems = dict.map({URLQueryItem(name: $0, value: $1.replacingOccurrences(of: " ", with: "%20"))})
+        }
     }
 }

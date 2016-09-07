@@ -31,8 +31,6 @@ class OAuth2Tests: XCTestCase {
             return
         }
         
-        //XCTAssertEqual(url, URL(string: "https://example.com/oauth/authorize?response_type=code&client_id=validClientID&redirect_uri=https://example.com/callback&state=12345&scope=email%20profile")!)
-        
         XCTAssertEqual(urlComponents.scheme, "https")
         XCTAssertEqual(urlComponents.host, "example.com")
         XCTAssertEqual(urlComponents.path, "/oauth/authorize")
@@ -49,6 +47,15 @@ class OAuth2Tests: XCTestCase {
         XCTAssert(queryItems.contains(URLQueryItem(name: "scope", value: "email profile")))
     }
     
+    func testThatURLComponentsHackIsNeeded() {
+        // See https://bugs.swift.org/browse/SR-2570
+        #if os(Linux)
+            var url = URLComponents(string: "https://test.com/")!
+            url.queryItems = [URLQueryItem(name: "test", value: "oh hey")]
+            XCTAssertNil(url.queryItems, "https://bugs.swift.org/browse/SR-2570 is solved, remove hack code in OAuth2.swift")
+        #endif
+    }
+    
     func testThatAuthorizationCodeIsExchangedForToken() {
         // NOT IMPLEMENTED - need to mock HTTPClient
     }
@@ -58,6 +65,7 @@ class OAuth2Tests: XCTestCase {
     }
     
     static var allTests = [
-        ("testThatCorrectLoginLinkIsGenerated", testThatCorrectLoginLinkIsGenerated)
+        ("testThatCorrectLoginLinkIsGenerated", testThatCorrectLoginLinkIsGenerated),
+        ("testThatURLComponentsHackIsNeeded", testThatURLComponentsHackIsNeeded)
     ]
 }
