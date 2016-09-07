@@ -48,7 +48,7 @@ class FacebookTests: XCTestCase {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        let urlSession = URLSession(configuration: URLSessionConfiguration.ephemeral)
+        let urlSession = URLSession(configuration: URLSessionConfiguration.default)
         
         guard let response = (try? urlSession.executeRequest(request: request))?.0 else {
             XCTFail("Could not connect to Facebook")

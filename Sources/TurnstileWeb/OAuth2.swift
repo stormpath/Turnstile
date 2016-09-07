@@ -30,7 +30,7 @@ public class OAuth2 {
     public let tokenURL: URL
     
     var urlSession: URLSession {
-        return URLSession(configuration: URLSessionConfiguration.ephemeral)
+        return URLSession(configuration: URLSessionConfiguration.default)
     }
     
     
