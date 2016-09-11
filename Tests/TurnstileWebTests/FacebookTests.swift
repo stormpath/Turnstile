@@ -71,6 +71,7 @@ class FacebookTests: XCTestCase {
 
 extension AccessToken {
     convenience init?(facebookResponse response: Response) {
+        print(response)
         guard let accessToken = response.json?["access_token"]?.string else {
             return nil
         }
