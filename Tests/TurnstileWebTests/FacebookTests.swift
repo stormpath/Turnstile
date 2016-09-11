@@ -60,7 +60,7 @@ class FacebookTests: XCTestCase {
     }
     
     private var appAccessToken: String {
-        return facebook.clientID + "%7C" + facebook.clientSecret
+        return facebook.clientID + "|" + facebook.clientSecret
     }
     
     static var allTests = [
