@@ -60,7 +60,7 @@ class FacebookTests: XCTestCase {
     }
     
     private var appAccessToken: String {
-        return facebook.clientID + "%7C" + facebook.clientSecret
+        return facebook.clientID + "|" + facebook.clientSecret
     }
     
     static var allTests = [
@@ -71,6 +71,7 @@ class FacebookTests: XCTestCase {
 
 extension AccessToken {
     convenience init?(facebookResponse response: Response) {
+        print(response)
         guard let accessToken = response.json?["access_token"]?.string else {
             return nil
         }
