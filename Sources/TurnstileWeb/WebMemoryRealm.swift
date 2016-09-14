@@ -14,7 +14,7 @@ import TurnstileCrypto
  WebMemoryRealm can store username / password pairs, Facebook, and Google credentials
  until the application is shut down.
  */
-public class MemoryRealm: Realm {
+public class WebMemoryRealm: Realm {
     private var accounts = [MemoryAccount]()
     private var random: Random = URandom()
     
