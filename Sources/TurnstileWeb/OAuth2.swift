@@ -62,7 +62,8 @@ public class OAuth2 {
         if let result = urlComponents?.url {
             return result
         } else {
-            preconditionFailure() // TODO: replace with a better error
+            // Gotta fail gracefully.
+            return URL(string: ".")!
         }
     }
     
@@ -80,7 +81,7 @@ public class OAuth2 {
         urlComponents?.setQueryItems(dict: queryItems)
         
         guard let url = urlComponents?.url else {
-            preconditionFailure() // TODO: replace with a better error
+            throw InvalidInput()
         }
         
         var request = URLRequest(url: url)
@@ -117,7 +118,7 @@ public class OAuth2 {
             throw OAuth2Error(dict: urlComponents.queryDictionary) ?? InvalidAPIResponse()
         }
         
-        let redirectURL = url.substring(to: url.range(of: "?")!.lowerBound)
+        let redirectURL = url.substring(to: url.range(of: "?")?.lowerBound ?? url.startIndex)
         return try exchange(authorizationCode: AuthorizationCode(code: code, redirectURL: redirectURL))
     }
     

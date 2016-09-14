@@ -96,3 +96,12 @@ public struct APIConnectionError: TurnstileError {
     /// Empty initializer
     public init() {}
 }
+
+/// We encountered unexpected input. This is most likely programmer error.
+public struct InvalidInput: TurnstileError {
+    /// User-presentable error message
+    public let description = "Unexpected error occurred."
+    
+    /// Empty initializer
+    public init() {}
+}
