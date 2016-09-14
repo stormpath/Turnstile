@@ -8,10 +8,6 @@
 
 import Turnstile
 import Foundation
-import HTTP
-import JSON
-import URI
-import Transport
 
 /**
  OAuth 2 represents the base API Client for an OAuth 2 server that implements the
@@ -28,16 +24,18 @@ public class OAuth2 {
     public let clientSecret: String
     
     /// The Authorization Endpoint of the OAuth 2 Server
-    public let authorizationURL: String
+    public let authorizationURL: URL
     
     /// The Token Endpoint of the OAuth 2 Server
-    public let tokenURL: String
+    public let tokenURL: URL
     
-    let HTTPClient = TempHTTPClient()
+    var urlSession: URLSession {
+        return URLSession(configuration: URLSessionConfiguration.default)
+    }
     
     
     /// Creates the OAuth 2 client
-    public init(clientID: String, clientSecret: String, authorizationURL: String, tokenURL: String) {
+    public init(clientID: String, clientSecret: String, authorizationURL: URL, tokenURL: URL) {
         self.clientID = clientID
         self.clientSecret = clientSecret
         self.authorizationURL = authorizationURL
@@ -51,17 +49,21 @@ public class OAuth2 {
     ///     You will need to configure this in the admin console for the OAuth provider's site.
     /// - parameter state:       A randomly generated string to prevent CSRF attacks. 
     ///     Verify this when validating the Authorization Code
-    /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant.
-    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> String {
-        // TODO: serialize these better
-        var loginLink = authorizationURL + "?"
-        loginLink += "response_type=code"
-        loginLink += "&client_id=" + clientID
-        loginLink += "&redirect_uri=" + redirectURL
-        loginLink += "&state=" + state
-        loginLink += "&scope=" + scopes.joined(separator: "%20")
+    /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant
+    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> URL {
+        let queryItems = ["response_type": "code",
+                          "client_id": clientID,
+                          "redirect_uri": redirectURL,
+                          "state": state,
+                          "scope": scopes.joined(separator: " ")]
+        var urlComponents = URLComponents(url: authorizationURL, resolvingAgainstBaseURL: false)
+        urlComponents?.setQueryItems(dict: queryItems)
         
-        return loginLink
+        if let result = urlComponents?.url {
+            return result
+        } else {
+            preconditionFailure() // TODO: replace with a better error
+        }
     }
     
     
@@ -70,18 +72,27 @@ public class OAuth2 {
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     public func exchange(authorizationCode: AuthorizationCode) throws -> OAuth2Token {
-        // TODO: serialize these better
-        let url = tokenURL + "?grant_type=authorization_code&client_id=\(clientID)&redirect_uri=\(authorizationCode.redirectURL)&client_secret=\(clientSecret)&code=\(authorizationCode.code)"
-        let request = try! Request(method: .post, uri: url)
+        let queryItems = ["client_id": clientID,
+                          "client_secret": clientSecret,
+                          "redirect_uri": authorizationCode.redirectURL,
+                          "code": authorizationCode.code]
+        var urlComponents = URLComponents(url: tokenURL, resolvingAgainstBaseURL: false)
+        urlComponents?.setQueryItems(dict: queryItems)
         
-        request.headers["Accept"] = "application/json"
+        guard let url = urlComponents?.url else {
+            preconditionFailure() // TODO: replace with a better error
+        }
         
-        guard let response = try? HTTPClient.respond(to: request) else {
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
             throw APIConnectionError()
         }
-        guard let json = response.json else {
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
             throw InvalidAPIResponse()
         }
+        
         guard let token = OAuth2Token(json: json) else {
             // Facebook doesn't do this error properly... probably have to override this
             if let error = OAuth2Error(json: json) {
@@ -99,10 +110,11 @@ public class OAuth2 {
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     /// - throws: OAuth2Error() if the oauth server calls back with an error
     public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
-        guard let uri = try? URI(url), let query = uri.queryDictionary else { throw InvalidAPIResponse() }
+        guard let urlComponents = URLComponents(string: url) else { throw InvalidAPIResponse() }
         
-        guard let code = query["code"], query["state"] == state else {
-            throw OAuth2Error(dict: query) ?? InvalidAPIResponse()
+        guard let code = urlComponents.queryDictionary["code"],
+            urlComponents.queryDictionary["state"] == state else {
+            throw OAuth2Error(dict: urlComponents.queryDictionary) ?? InvalidAPIResponse()
         }
         
         let redirectURL = url.substring(to: url.range(of: "?")!.lowerBound)
@@ -124,18 +136,48 @@ public extension Realm where Self: OAuth2 {
     }
 }
 
-private extension URI {
-    var queryDictionary: [String: String]? {
-        guard let queryComponents = self.query?.components(separatedBy: "&") else { return nil }
+extension URLComponents {
+    var queryDictionary: [String: String] {
+//        guard let queryItems = queryItems else { return nil }
+//        var dictionary = [String: String]()
+//        for queryItem in queryItems {
+//            dictionary[queryItem.name] = queryItem.value
+//        }
+//        return dictionary
+        
+        // URLQueryItems are messed up on Linux, so we'll do this instead:
         
         var result = [String: String]()
-        for component in queryComponents {
-            let pair = component.components(separatedBy: "=")
+        
+        guard let components = query?.components(separatedBy: "&") else {
+            return result
+        }
+        
+        components.forEach { component in
+            let queryPair = component.components(separatedBy: "=")
             
-            if pair.count == 2 {
-                result[pair[0]] = pair[1]
+            if queryPair.count == 2 {
+                result[queryPair[0]] = queryPair[1]
+            } else {
+                result[queryPair[0]] = ""
             }
         }
         return result
+    }
+}
+
+extension URLComponents {
+    mutating func setQueryItems(dict: [String: String]) {
+//        self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
+//        
+//        // Hack for linux because of https://bugs.swift.org/browse/SR-2570
+//        if queryItems == nil {
+//                    self.queryItems = dict.map({URLQueryItem(name: $0, value: $1.replacingOccurrences(of: " ", with: "%20"))})
+//        }
+        
+        // URLQueryItems are messed up on Linux, so we'll do this instead:
+        query = dict.map { (key, value) in
+            return key + "=" + value
+        }.joined(separator: "&")
     }
 }

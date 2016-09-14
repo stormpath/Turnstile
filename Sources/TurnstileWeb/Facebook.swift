@@ -6,9 +6,8 @@
 //
 //
 
+import Foundation
 import Turnstile
-import HTTP
-import JSON
 
 /**
  Facebook allows you to authenticate against Facebook for login purposes.
@@ -19,8 +18,8 @@ public class Facebook: OAuth2, Realm {
      Facebook Developers Console.
      */
     public init(clientID: String, clientSecret: String) {
-        let tokenURL = "https://graph.facebook.com/v2.3/oauth/access_token"
-        let authorizationURL = "https://www.facebook.com/dialog/oauth"
+        let tokenURL = URL(string: "https://graph.facebook.com/v2.3/oauth/access_token")!
+        let authorizationURL = URL(string: "https://www.facebook.com/dialog/oauth")!
         super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
     }
     
@@ -40,19 +39,30 @@ public class Facebook: OAuth2, Realm {
      Authenticates a Facebook access token.
      */
     public func authenticate(credentials: AccessToken) throws -> FacebookAccount {
-        let url = "https://graph.facebook.com/debug_token?input_token=" + credentials.string + "&access_token=" + appAccessToken
-        let request = try! Request(method: .get, uri: url)
-        request.headers["Accept"] = "application/json"
+        var urlComponents = URLComponents(string: "https://graph.facebook.com/debug_token")!
+        urlComponents.setQueryItems(dict: ["input_token": credentials.string,
+                                           "access_token": appAccessToken])
         
-        guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
-        guard let json = response.json else { throw InvalidAPIResponse() }
+        guard let url = urlComponents.url else {
+            throw FacebookError(json: [String: Any]())
+        }
         
-        guard let responseData = json["data"]?.object else {
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
+            throw APIConnectionError()
+        }
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+            throw InvalidAPIResponse()
+        }
+        
+        guard let responseData = json["data"] as? [String: Any] else {
             throw FacebookError(json: json)
         }
 
-        if let accountID = responseData["user_id"]?.string
-            , responseData["app_id"]?.string == clientID && responseData["is_valid"]?.bool == true {
+        if let accountID = responseData["user_id"] as? String
+            , responseData["app_id"] as? String == clientID && responseData["is_valid"] as? Bool == true {
             return FacebookAccount(uniqueID: accountID)
         }
         
@@ -82,7 +92,7 @@ public struct FacebookError: TurnstileError {
     public let description: String
     
     /// Initializer
-    public init(json: JSON) {
-        description = json["error"]?["message"]?.string ?? "Unknown Facebook Login Error"
+    public init(json: [String: Any]) {
+        description = (json["error"] as? [String: Any])?["message"] as? String ?? "Unknown Facebook Login Error"
     }
 }

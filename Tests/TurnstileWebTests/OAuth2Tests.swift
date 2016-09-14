@@ -15,8 +15,8 @@ class OAuth2Tests: XCTestCase {
     var oauth2: OAuth2!
     let validClientID = "validClientID"
     let validClientSecret = "validClientSecret"
-    let authorizationURL = "https://example.com/oauth/authorize"
-    let tokenURL = "https://example.com/oauth/token"
+    let authorizationURL = URL(string: "https://example.com/oauth/authorize")!
+    let tokenURL = URL(string: "https://example.com/oauth/token")!
     let redirectURL = "https://example.com/callback"
     let state = "12345"
     let scopes = ["email", "profile"]
@@ -26,9 +26,31 @@ class OAuth2Tests: XCTestCase {
     }
     
     func testThatCorrectLoginLinkIsGenerated() {
-        let url = oauth2.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
+        guard let urlComponents = URLComponents(url: oauth2.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes), resolvingAgainstBaseURL: false) else {
+            XCTFail()
+            return
+        }
         
-        XCTAssertEqual(url, "https://example.com/oauth/authorize?response_type=code&client_id=validClientID&redirect_uri=https://example.com/callback&state=12345&scope=email%20profile")
+        XCTAssertEqual(urlComponents.scheme, "https")
+        XCTAssertEqual(urlComponents.host, "example.com")
+        XCTAssertEqual(urlComponents.path, "/oauth/authorize")
+        
+        let queryItems = urlComponents.queryDictionary
+        
+        XCTAssertEqual(queryItems["response_type"], "code")
+        XCTAssertEqual(queryItems["client_id"], "validClientID")
+        XCTAssertEqual(queryItems["redirect_uri"], "https://example.com/callback")
+        XCTAssertEqual(queryItems["state"], "12345")
+        XCTAssertEqual(queryItems["scope"], "email profile")
+    }
+    
+    func testThatURLComponentsHackIsNeeded() {
+        // See https://bugs.swift.org/browse/SR-2570
+        #if os(Linux)
+            var url = URLComponents(string: "https://test.com/")!
+            url.queryItems = [URLQueryItem(name: "test", value: "oh hey")]
+            XCTAssertNil(url.queryItems, "https://bugs.swift.org/browse/SR-2570 is solved, remove hack code in OAuth2.swift")
+        #endif
     }
     
     func testThatAuthorizationCodeIsExchangedForToken() {
@@ -40,6 +62,7 @@ class OAuth2Tests: XCTestCase {
     }
     
     static var allTests = [
-        ("testThatCorrectLoginLinkIsGenerated", testThatCorrectLoginLinkIsGenerated)
+        ("testThatCorrectLoginLinkIsGenerated", testThatCorrectLoginLinkIsGenerated),
+        ("testThatURLComponentsHackIsNeeded", testThatURLComponentsHackIsNeeded)
     ]
 }

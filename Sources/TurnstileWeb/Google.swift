@@ -8,8 +8,6 @@
 
 import Foundation
 import Turnstile
-import HTTP
-import JSON
 
 // TODO: split out some of this logic into an OpenID Connect framework. 
 
@@ -23,8 +21,8 @@ public class Google: OAuth2, Realm {
      Google Developers Console.
      */
     public init(clientID: String, clientSecret: String) {
-        let tokenURL = "https://www.googleapis.com/oauth2/v4/token"
-        let authorizationURL = "https://accounts.google.com/o/oauth2/auth"
+        let tokenURL = URL(string: "https://www.googleapis.com/oauth2/v4/token")!
+        let authorizationURL = URL(string: "https://accounts.google.com/o/oauth2/auth")!
         super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
     }
     
@@ -44,22 +42,27 @@ public class Google: OAuth2, Realm {
      Authenticates a Google access token.
      */
     public func authenticate(credentials: AccessToken) throws -> GoogleAccount {
-        let url = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string
-        let request = try! Request(method: .get, uri: url)
-        request.headers["Accept"] = "application/json"
+        let url = URL(string: "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string)!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        guard let response = try? HTTPClient.respond(to: request) else { throw APIConnectionError() }
-        guard let json = response.json else { throw InvalidAPIResponse() }
+        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
+            throw APIConnectionError()
+        }
         
-        if let accountID = json["sub"]?.string
-            , json["aud"]?.string?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
+        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+            throw InvalidAPIResponse()
+        }
+        
+        if let accountID = json["sub"] as? String
+            , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
             return GoogleAccount(uniqueID: accountID)
         }
         
         throw IncorrectCredentialsError()
     }
     
-    public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> String {
+    public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> URL {
         return super.getLoginLink(redirectURL: redirectURL, state: state, scopes: scopes)
     }
 }
@@ -75,7 +78,7 @@ public struct GoogleAccount: Account, Credentials {
 public struct GoogleError: TurnstileError {
     public let description: String
     
-    public init(json: JSON) {
-        description = json["error"]?["message"]?.string ?? "Unknown Google Login Error"
+    public init(json: [String: Any]) {
+        description = (json["error"] as? [String: Any])?["message"] as? String ?? "Unknown Google Login Error"
     }
 }
