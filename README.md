@@ -113,7 +113,11 @@ To get started, you first need to [register an application](https://developers.f
 
 In the `Valid OAuth redirect URIs` box, type in a URL you'll use for step 3 in the OAuth process. (eg, `http://localhost:8080/login/facebook/consumer`)
 
-#### Create Google Application
+#### Create a Google Application
+
+To get started, you first need to [register an application](https://console.developers.google.com/project) with Google. Click "Enable and Manage APIs", and then the [credentials tab](https://console.developers.google.com/apis/credentials). Create an OAuth Client ID for "Web".
+
+Add a URL you'll use for step 3 in the OAuth process to the `Authorized redirect URIs` list. (eg, `http://localhost:8080/login/google/consumer`)
 
 #### Initiating the Login Redirect
 
