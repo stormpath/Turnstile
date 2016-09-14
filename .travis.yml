@@ -7,6 +7,7 @@ dist: trusty
 osx_image: xcode8
 script:
 - eval "$(curl -sL swift.qutheory.io/ci)"
+- eval "$(curl -sL swift.qutheory.io/codecov)"
 notifications:
   slack: talkstormpath:kN559lSL73v5N6DQ796LRtwm
 env:

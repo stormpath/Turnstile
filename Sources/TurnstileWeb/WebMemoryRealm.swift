@@ -1,0 +1,108 @@
+//
+//  WebMemoryRealm.swift
+//  Turnstile
+//
+//  Created by Edward Jiang on 9/14/16.
+//
+//
+
+import Turnstile
+import TurnstileCrypto
+
+/**
+ WebMemoryRealm is a default implementation of the Realm protocol for testing purposes, with support for TurnstileWeb.
+ WebMemoryRealm can store username / password pairs, Facebook, and Google credentials
+ until the application is shut down.
+ */
+public class MemoryRealm: Realm {
+    private var accounts = [MemoryAccount]()
+    
+    /// Initializer for MemoryRealm
+    public init() { }
+    
+    /**
+     Authenticates PasswordCredentials against the Realm.
+     */
+    public func authenticate(credentials: Credentials) throws -> Account {
+        switch credentials {
+        case let credentials as UsernamePassword:
+            return try authenticate(credentials: credentials)
+        case let credentials as FacebookAccount:
+            return try authenticate(credentials: credentials)
+        case let credentials as GoogleAccount:
+            return try authenticate(credentials: credentials)
+        default:
+            throw UnsupportedCredentialsError()
+        }
+    }
+    
+    private func authenticate(credentials: UsernamePassword) throws -> Account {
+        if let account = accounts.filter({$0.username == credentials.username && $0.password == credentials.password}).first {
+            return account
+        } else {
+            throw IncorrectCredentialsError()
+        }
+    }
+    
+    private func authenticate(credentials: FacebookAccount) throws -> Account {
+        if let account = accounts.filter({$0.facebookID == credentials.uniqueID}).first {
+            return account
+        } else {
+            throw IncorrectCredentialsError()
+        }
+    }
+    
+    private func authenticate(credentials: GoogleAccount) throws -> Account {
+        if let account = accounts.filter({$0.googleID == credentials.uniqueID}).first {
+            return account
+        } else {
+            throw IncorrectCredentialsError()
+        }
+    }
+    
+    /**
+     Registers PasswordCredentials against the MemoryRealm.
+     */
+    public func register(credentials: Credentials) throws -> Account {
+        var newAccount = MemoryAccount(id: String(URandom().uint64))
+
+        switch credentials {
+        case let credentials as UsernamePassword:
+            guard accounts.filter({$0.username == credentials.username}).first == nil else {
+                throw AccountTakenError()
+            }
+            newAccount.username = credentials.username
+            newAccount.password = credentials.password
+        case let credentials as FacebookAccount:
+            guard accounts.filter({$0.facebookID == credentials.uniqueID}).first == nil else {
+                throw AccountTakenError()
+            }
+            newAccount.facebookID = credentials.uniqueID
+        case let credentials as GoogleAccount:
+            guard accounts.filter({$0.googleID == credentials.uniqueID}).first == nil else {
+                throw AccountTakenError()
+            }
+            newAccount.googleID = credentials.uniqueID
+        default:
+            throw UnsupportedCredentialsError()
+        }
+        
+        return newAccount
+    }
+}
+
+/**
+ Account object representing an account in the MemoryRealm.
+ */
+fileprivate struct MemoryAccount: Account {
+    fileprivate var uniqueID: String
+    fileprivate var username: String?
+    fileprivate var password: String?
+    
+    fileprivate var facebookID: String?
+    fileprivate var googleID: String?
+    
+    fileprivate init(id: String) {
+        uniqueID = id
+    }
+}
