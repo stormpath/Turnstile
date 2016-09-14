@@ -16,6 +16,7 @@ import TurnstileCrypto
  */
 public class MemoryRealm: Realm {
     private var accounts = [MemoryAccount]()
+    private var random: Random = URandom()
     
     /// Initializer for MemoryRealm
     public init() { }
@@ -64,7 +65,7 @@ public class MemoryRealm: Realm {
      Registers PasswordCredentials against the MemoryRealm.
      */
     public func register(credentials: Credentials) throws -> Account {
-        var newAccount = MemoryAccount(id: String(URandom().uint64))
+        var newAccount = MemoryAccount(id: String(random.secureToken))
 
         switch credentials {
         case let credentials as UsernamePassword:

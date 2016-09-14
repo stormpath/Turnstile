@@ -27,10 +27,7 @@ public class MemorySessionManager: SessionManager {
         
         // Create new random identifiers and find an unused one.
         repeat {
-            identifier = Data(bytes: random.random(numBytes: 16)).base64EncodedString()
-            identifier = identifier.replacingOccurrences(of: "=", with: "")
-            identifier = identifier.replacingOccurrences(of: "+", with: "-")
-            identifier = identifier.replacingOccurrences(of: "/", with: "_")
+            identifier = random.secureToken
         } while sessions[identifier] != nil
         
         sessions[identifier] = account.uniqueID

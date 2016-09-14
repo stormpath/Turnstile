@@ -43,4 +43,7 @@ public protocol Random {
     
     /// Get a random uint
     var uint: UInt { get }
+    
+    /// Get a random string usable for authentication purposes
+    var secureToken: String { get }
 }

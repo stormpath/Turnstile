@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 #if os(Linux) || os(FreeBSD)
     import Glibc
 #else
@@ -94,5 +96,19 @@ public class URandom: Random {
     /// Get a random uint
     public var uint: UInt {
         return UInt(bitPattern: int)
+    }
+    
+    /// Get a random string usable for authentication purposes
+    public var secureToken: String {
+        return Data(bytes: random(numBytes: 16)).base64UrlEncodedString
+    }
+}
+
+extension Data {
+    var base64UrlEncodedString: String {
+        return base64EncodedString()
+            .replacingOccurrences(of: "=", with: "")
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
     }
 }
