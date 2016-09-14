@@ -110,11 +110,11 @@ public class OAuth2 {
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     /// - throws: OAuth2Error() if the oauth server calls back with an error
     public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
-        guard let urlComponents = URLComponents(string: url),
-            let query = urlComponents.queryDictionary else { throw InvalidAPIResponse() }
+        guard let urlComponents = URLComponents(string: url) else { throw InvalidAPIResponse() }
         
-        guard let code = query["code"], query["state"] == state else {
-            throw OAuth2Error(dict: query) ?? InvalidAPIResponse()
+        guard let code = urlComponents.queryDictionary["code"],
+            urlComponents.queryDictionary["state"] == state else {
+            throw OAuth2Error(dict: urlComponents.queryDictionary) ?? InvalidAPIResponse()
         }
         
         let redirectURL = url.substring(to: url.range(of: "?")!.lowerBound)
@@ -137,23 +137,47 @@ public extension Realm where Self: OAuth2 {
 }
 
 extension URLComponents {
-    var queryDictionary: [String: String]? {
-        guard let queryItems = queryItems else { return nil }
-        var dictionary = [String: String]()
-        for queryItem in queryItems {
-            dictionary[queryItem.name] = queryItem.value
+    var queryDictionary: [String: String] {
+//        guard let queryItems = queryItems else { return nil }
+//        var dictionary = [String: String]()
+//        for queryItem in queryItems {
+//            dictionary[queryItem.name] = queryItem.value
+//        }
+//        return dictionary
+        
+        // URLQueryItems are messed up on Linux, so we'll do this instead:
+        
+        var result = [String: String]()
+        
+        guard let components = query?.components(separatedBy: "&") else {
+            return result
         }
-        return dictionary
+        
+        components.forEach { component in
+            let queryPair = component.components(separatedBy: "=")
+            
+            if queryPair.count == 2 {
+                result[queryPair[0]] = queryPair[1]
+            } else {
+                result[queryPair[0]] = ""
+            }
+        }
+        return result
     }
 }
 
 extension URLComponents {
     mutating func setQueryItems(dict: [String: String]) {
-        self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
+//        self.queryItems = dict.map({URLQueryItem(name: $0, value: $1)})
+//        
+//        // Hack for linux because of https://bugs.swift.org/browse/SR-2570
+//        if queryItems == nil {
+//                    self.queryItems = dict.map({URLQueryItem(name: $0, value: $1.replacingOccurrences(of: " ", with: "%20"))})
+//        }
         
-        // Hack for linux because of https://bugs.swift.org/browse/SR-2570
-        if queryItems == nil {
-            self.queryItems = dict.map({URLQueryItem(name: $0, value: $1.replacingOccurrences(of: " ", with: "%20"))})
-        }
+        // URLQueryItems are messed up on Linux, so we'll do this instead:
+        query = dict.map { (key, value) in
+            return key + "=" + value
+        }.joined(separator: "&")
     }
 }

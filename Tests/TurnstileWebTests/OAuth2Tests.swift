@@ -35,16 +35,13 @@ class OAuth2Tests: XCTestCase {
         XCTAssertEqual(urlComponents.host, "example.com")
         XCTAssertEqual(urlComponents.path, "/oauth/authorize")
         
-        guard let queryItems = urlComponents.queryItems else {
-            XCTFail("No query parameters found in the generated URL")
-            return
-        }
+        let queryItems = urlComponents.queryDictionary
         
-        XCTAssert(queryItems.contains(URLQueryItem(name: "response_type", value: "code")))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "client_id", value: "validClientID")))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "redirect_uri", value: "https://example.com/callback")))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "state", value: "12345")))
-        XCTAssert(queryItems.contains(URLQueryItem(name: "scope", value: "email profile")))
+        XCTAssertEqual(queryItems["response_type"], "code")
+        XCTAssertEqual(queryItems["client_id"], "validClientID")
+        XCTAssertEqual(queryItems["redirect_uri"], "https://example.com/callback")
+        XCTAssertEqual(queryItems["state"], "12345")
+        XCTAssertEqual(queryItems["scope"], "email profile")
     }
     
     func testThatURLComponentsHackIsNeeded() {
