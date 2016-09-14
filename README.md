@@ -146,10 +146,10 @@ let credentials = try google.authenticate(authorizationCodeCallbackURL: url, sta
 
 These can throw the following errors:
 
-* `InvalidAuthorizationCodeError()` if the Authorization Code could not be validated
-* `APIConnectionError()` if we cannot connect to the OAuth server
-* `InvalidAPIResponse()` if the server does not respond in a way we expect
-* `OAuth2Error()` if the OAuth server calls back with an error
+* `InvalidAuthorizationCodeError` if the Authorization Code could not be validated
+* `APIConnectionError` if we cannot connect to the OAuth server
+* `InvalidAPIResponse` if the server does not respond in a way we expect
+* `OAuth2Error` if the OAuth server calls back with an error
 
 
 If successful, it will return a `FacebookAccount` or `GoogleAccount`. These implement the `Credentials` protocol, so then can be passed back into your application's Realm for further validation.
