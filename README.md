@@ -26,11 +26,9 @@ The easiest way to use Turnstile is with one of its prebuilt integrations with S
 * [Perfect](https://github.com/PerfectlySoft/Perfect) - The [Turnstile-Perfect](https://github.com/stormpath/Turnstile-Perfect) integration is currently in development. 
 * [Kitura](https://github.com/IBM-Swift/Kitura) - A Kitura integration is planned.
 
-# Concepts
+# Using Turnstile
 
 If you'd like to use Turnstile to build your own integration, it's useful to understand key concepts in Turnstile. 
-
-## Using Turnstile
 
 ## Subject
 
