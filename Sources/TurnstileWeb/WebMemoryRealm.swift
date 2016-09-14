@@ -49,7 +49,7 @@ public class MemoryRealm: Realm {
         if let account = accounts.filter({$0.facebookID == credentials.uniqueID}).first {
             return account
         } else {
-            throw IncorrectCredentialsError()
+            return try register(credentials: credentials)
         }
     }
     
@@ -57,7 +57,7 @@ public class MemoryRealm: Realm {
         if let account = accounts.filter({$0.googleID == credentials.uniqueID}).first {
             return account
         } else {
-            throw IncorrectCredentialsError()
+            return try register(credentials: credentials)
         }
     }
     
