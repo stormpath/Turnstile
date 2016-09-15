@@ -23,7 +23,7 @@ If you're a developer of an application or product and need to integrate Turnsti
 The easiest way to use Turnstile is with one of its prebuilt integrations with Swift web frameworks. Here are the frameworks and their statuses:
 
 * [Vapor](https://github.com/vapor/vapor) - Turnstile is integrated directly into Vapor.
-* [Perfect](https://github.com/PerfectlySoft/Perfect) - The [Turnstile-Perfect](https://github.com/stormpath/Turnstile-Perfect) integration is currently in development. 
+* [Perfect](https://github.com/PerfectlySoft/Perfect) - The [Turnstile-Perfect](https://github.com/stormpath/Turnstile-Perfect) integration allows you to use Turnstile with Perfect. 
 * [Kitura](https://github.com/IBM-Swift/Kitura) - A Kitura integration is planned.
 
 # Using Turnstile
@@ -165,4 +165,8 @@ Tests are powered by XCTest. To successfully perform the Facebook Login tests, y
 
 # Contributing
 
-We're always open to contributions! Since this probject is fairly early stage, please join the [Stormpath slack channel](https://talkstormpath.shipit.xyz) to discuss how you can contribute!
+We're always open to contributions! Feel free to join the [Stormpath slack channel](https://talkstormpath.shipit.xyz) to discuss how you can contribute!
+
+# Stormpath
+
+Turnstile is built by [Stormpath](https://stormpath.com), an API service for authentication, authorization, and user management. If you're building a website, API, or app, and need to build authentication and user managmeent, consider using Stormpath for your needs. We're always happy to help!
