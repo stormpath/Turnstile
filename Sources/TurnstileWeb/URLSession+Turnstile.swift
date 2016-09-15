@@ -9,7 +9,11 @@
 import Foundation
 import Dispatch
 
-extension URLSession {
+protocol HTTPClient {
+    func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?)
+}
+
+extension URLSession: HTTPClient {
     func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?) {
         var data: Data?
         var response: URLResponse?

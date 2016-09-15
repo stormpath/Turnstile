@@ -66,7 +66,7 @@ public class WebMemoryRealm: Realm {
      */
     public func register(credentials: Credentials) throws -> Account {
         var newAccount = MemoryAccount(id: String(random.secureToken))
-
+        
         switch credentials {
         case let credentials as UsernamePassword:
             guard accounts.filter({$0.username == credentials.username}).first == nil else {
@@ -87,7 +87,7 @@ public class WebMemoryRealm: Realm {
         default:
             throw UnsupportedCredentialsError()
         }
-        
+        accounts.append(newAccount)
         return newAccount
     }
 }
