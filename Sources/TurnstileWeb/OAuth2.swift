@@ -36,7 +36,7 @@ open class OAuth2 {
     var _urlSession: HTTPClientGenerator = { URLSession(configuration: URLSessionConfiguration.default) }
     
     /// We don't want URLSessions to store cookies, so we have to generate a new one for each request. 
-    var urlSession: HTTPClient {
+    public var urlSession: HTTPClient {
         return _urlSession()
     }
     
