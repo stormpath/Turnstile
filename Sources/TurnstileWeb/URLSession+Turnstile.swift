@@ -9,12 +9,12 @@
 import Foundation
 import Dispatch
 
-protocol HTTPClient {
+public protocol HTTPClient {
     func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?)
 }
 
 extension URLSession: HTTPClient {
-    func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?) {
+    public func executeRequest(request: URLRequest) throws -> (Data?, URLResponse?) {
         var data: Data?
         var response: URLResponse?
         var error: Error?

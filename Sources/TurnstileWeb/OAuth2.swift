@@ -19,7 +19,7 @@ typealias HTTPClientGenerator = () -> HTTPClient
  
  Since OAuth doesn't define token validation, implementing it is up to a subclass.
  */
-public class OAuth2 {
+open class OAuth2 {
     /// The Client ID for the OAuth 2 Server
     public let clientID: String
     
@@ -36,7 +36,7 @@ public class OAuth2 {
     var _urlSession: HTTPClientGenerator = { URLSession(configuration: URLSessionConfiguration.default) }
     
     /// We don't want URLSessions to store cookies, so we have to generate a new one for each request. 
-    var urlSession: HTTPClient {
+    public var urlSession: HTTPClient {
         return _urlSession()
     }
     
@@ -57,7 +57,7 @@ public class OAuth2 {
     /// - parameter state:       A randomly generated string to prevent CSRF attacks.
     ///     Verify this when validating the Authorization Code
     /// - parameter scopes:      A list of OAuth scopes you'd like the user to grant
-    public func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> URL {
+    open func getLoginLink(redirectURL: String, state: String, scopes: [String] = []) -> URL {
         let queryItems = ["response_type": "code",
                           "client_id": clientID,
                           "redirect_uri": redirectURL,
@@ -79,7 +79,7 @@ public class OAuth2 {
     /// - throws: InvalidAuthorizationCodeError() if the Authorization Code could not be validated
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
-    public func exchange(authorizationCode: AuthorizationCode) throws -> OAuth2Token {
+    open func exchange(authorizationCode: AuthorizationCode) throws -> OAuth2Token {
         let postBody = ["grant_type": "authorization_code",
                         "client_id": clientID,
                         "client_secret": clientSecret,
@@ -120,7 +120,7 @@ public class OAuth2 {
     /// - throws: APIConnectionError() if we cannot connect to the OAuth server
     /// - throws: InvalidAPIResponse() if the server does not respond in a way we expect
     /// - throws: OAuth2Error() if the oauth server calls back with an error
-    public func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
+    open func exchange(authorizationCodeCallbackURL url: String, state: String) throws -> OAuth2Token {
         guard let urlComponents = URLComponents(string: url) else { throw InvalidAPIResponse() }
         
         guard let code = urlComponents.queryDictionary["code"],
