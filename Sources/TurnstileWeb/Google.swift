@@ -14,8 +14,10 @@ import Turnstile
  */
 public class Google: OpenIDConnect<GoogleAccount> {
     
-    /// Create a Google object. Uses the Client ID and Client Secret from the
-    /// Google Developers Console.
+    /**
+     Create a Google object. Uses the Client ID and Client Secret from the
+     Google Developers Console.
+     */
     public init(clientID: String, clientSecret: String) {
         let tokenURL = URL(string: "https://www.googleapis.com/oauth2/v4/token")!
         let authorizationURL = URL(string: "https://accounts.google.com/o/oauth2/auth")!
@@ -24,8 +26,8 @@ public class Google: OpenIDConnect<GoogleAccount> {
     }
     
     /**
-      Turns the credentials passed through the OAuth2 exchange into a Google
-      user data request.
+     Turns the credentials passed through the OAuth2 exchange into a Google
+     user data request.
      */
     public override func authenticatedRequest(credentials: AccessToken) -> URLRequest {
         let urlString = "\(userDataURL.absoluteString)?access_token=\(credentials.string)"
@@ -35,7 +37,7 @@ public class Google: OpenIDConnect<GoogleAccount> {
     }
     
     /**
-      Creates a Google account from the JSON passed-in.
+     Creates a Google account from the JSON passed-in.
      */
     public override func makeAccount(json: [String : Any]) throws -> GoogleAccount {
         guard let accountID = json["sub"] as? String,
