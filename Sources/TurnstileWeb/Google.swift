@@ -9,57 +9,40 @@
 import Foundation
 import Turnstile
 
-// TODO: split out some of this logic into an OpenID Connect framework. 
-
 /**
  Google allows you to authenticate against Google for login purposes.
  */
-public class Google: OAuth2, Realm {
-
-    /**
-     Create a Google object. Uses the Client ID and Client Secret from the
-     Google Developers Console.
-     */
+public class Google: OpenIDConnect<GoogleAccount> {
+    
+    /// Create a Google object. Uses the Client ID and Client Secret from the
+    /// Google Developers Console.
     public init(clientID: String, clientSecret: String) {
         let tokenURL = URL(string: "https://www.googleapis.com/oauth2/v4/token")!
         let authorizationURL = URL(string: "https://accounts.google.com/o/oauth2/auth")!
-        super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL)
+        let userDataURL = URL(string: "https://www.googleapis.com/oauth2/v3/tokeninfo")!
+        super.init(clientID: clientID, clientSecret: clientSecret, authorizationURL: authorizationURL, tokenURL: tokenURL, userDataURL: userDataURL)
     }
     
     /**
-     Authenticates a Google access token.
+      Turns the credentials passed through the OAuth2 exchange into a Google
+      user data request.
      */
-    public func authenticate(credentials: Credentials) throws -> Account {
-        switch credentials {
-        case let credentials as AccessToken:
-            return try authenticate(credentials: credentials)
-        default:
-            throw UnsupportedCredentialsError()
-        }
-    }
-    
-    /**
-     Authenticates a Google access token.
-     */
-    public func authenticate(credentials: AccessToken) throws -> GoogleAccount {
-        let url = URL(string: "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + credentials.string)!
-        var request = URLRequest(url: url)
+    public override func authenticatedRequest(credentials: AccessToken) -> URLRequest {
+        let urlString = "\(userDataURL.absoluteString)?access_token=\(credentials.string)"
+        var request = URLRequest(url: URL(string: urlString)!)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
-        guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
-            throw APIConnectionError()
+        return request
+    }
+    
+    /**
+      Creates a Google account from the JSON passed-in.
+     */
+    public override func makeAccount(json: [String : Any]) throws -> GoogleAccount {
+        guard let accountID = json["sub"] as? String,
+            (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first else {
+                throw IncorrectCredentialsError()
         }
-        
-        guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
-            throw InvalidAPIResponse()
-        }
-        
-        if let accountID = json["sub"] as? String
-            , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
-            return GoogleAccount(uniqueID: accountID)
-        }
-        
-        throw IncorrectCredentialsError()
+        return GoogleAccount(uniqueID: accountID)
     }
     
     public override func getLoginLink(redirectURL: String, state: String, scopes: [String] = ["profile"]) -> URL {
@@ -68,7 +51,7 @@ public class Google: OAuth2, Realm {
 }
 
 /**
- A Google account
+ A Google account with a unique ID
  */
 public struct GoogleAccount: Account, Credentials {
     public let uniqueID: String
