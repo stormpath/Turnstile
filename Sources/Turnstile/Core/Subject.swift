@@ -10,7 +10,7 @@
  The user represents the current operating user in Turnstile. This can be anonymous,
  or authenticated against a realm.
  */
-public class Subject {
+open class Subject {
     /// A reference to the Turnstile instance mapped to 
     private let turnstile: Turnstile
     
