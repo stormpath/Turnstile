@@ -28,6 +28,8 @@ public class WebMemoryRealm: Realm {
         switch credentials {
         case let credentials as UsernamePassword:
             return try authenticate(credentials: credentials)
+        case let credentials as APIKey:
+            return try authenticate(credentials: credentials)
         case let credentials as FacebookAccount:
             return try authenticate(credentials: credentials)
         case let credentials as GoogleAccount:
@@ -39,6 +41,14 @@ public class WebMemoryRealm: Realm {
     
     private func authenticate(credentials: UsernamePassword) throws -> Account {
         if let account = accounts.filter({$0.username == credentials.username && $0.password == credentials.password}).first {
+            return account
+        } else {
+            throw IncorrectCredentialsError()
+        }
+    }
+    
+    private func authenticate(credentials: APIKey) throws -> Account {
+        if let account = accounts.filter({$0.uniqueID == credentials.id && $0.apiKeySecret == credentials.secret}).first {
             return account
         } else {
             throw IncorrectCredentialsError()
@@ -95,15 +105,16 @@ public class WebMemoryRealm: Realm {
 /**
  Account object representing an account in the MemoryRealm.
  */
-fileprivate struct MemoryAccount: Account {
-    fileprivate var uniqueID: String
-    fileprivate var username: String?
-    fileprivate var password: String?
+public struct MemoryAccount: Account {
+    public var uniqueID: String
+    public var username: String?
+    public var password: String?
+    public var apiKeySecret: String = URandom().secureToken
     
-    fileprivate var facebookID: String?
-    fileprivate var googleID: String?
+    public var facebookID: String?
+    public var googleID: String?
     
-    fileprivate init(id: String) {
+    init(id: String) {
         uniqueID = id
     }
 }

@@ -18,12 +18,16 @@ class WebMemoryRealmTests: XCTestCase {
     let googleAccount = GoogleAccount(uniqueID: "GOOGLE_ACCOUNT")
     var realm: WebMemoryRealm!
     
+    var validAPIKey: APIKey!
+    let invalidAPIKey = APIKey(id: "INVALID_ID", secret: "INVALID_SECRET")
+    
     override func setUp() {
         realm = WebMemoryRealm()
         do {
-            _ = try realm.register(credentials: usernamePassword)
+            let user = try realm.register(credentials: usernamePassword) as! MemoryAccount
             _ = try realm.register(credentials: facebookAccount)
             _ = try realm.register(credentials: googleAccount)
+            validAPIKey = APIKey(id: user.uniqueID, secret: user.apiKeySecret)
         } catch {
             XCTFail("Could not register credentials")
         }
@@ -40,6 +44,23 @@ class WebMemoryRealmTests: XCTestCase {
     func testLoginWithInvalidUsernamePassword() {
         do {
             _ = try realm.authenticate(credentials: invalidUsernamePassword)
+            XCTFail("We should not authenticate bad credentials")
+        } catch let e {
+            XCTAssert(e is IncorrectCredentialsError)
+        }
+    }
+    
+    func testLoginWithAPIKey() {
+        do {
+            _ = try realm.authenticate(credentials: validAPIKey)
+        } catch {
+            XCTFail("We should not fail to authenticate user")
+        }
+    }
+    
+    func testLoginWithInvalidAPIKey() {
+        do {
+            _ = try realm.authenticate(credentials: invalidAPIKey)
             XCTFail("We should not authenticate bad credentials")
         } catch let e {
             XCTAssert(e is IncorrectCredentialsError)
