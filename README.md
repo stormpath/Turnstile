@@ -24,6 +24,7 @@ The easiest way to use Turnstile is with one of its prebuilt integrations with S
 
 * [Vapor](https://github.com/vapor/vapor) - Turnstile is integrated directly into Vapor.
 * [Perfect](https://github.com/PerfectlySoft/Perfect) - The [Turnstile-Perfect](https://github.com/stormpath/Turnstile-Perfect) integration allows you to use Turnstile with Perfect. 
+* [Zewo](http://www.zewo.io) - A [Zewo integration](https://github.com/Zewo/TurnstileMiddleware) is in development
 * [Kitura](https://github.com/IBM-Swift/Kitura) - A Kitura integration is planned.
 
 # Using Turnstile
