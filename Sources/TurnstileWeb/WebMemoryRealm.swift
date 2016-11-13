@@ -11,7 +11,7 @@ import TurnstileCrypto
 
 /**
  WebMemoryRealm is a default implementation of the Realm protocol for testing purposes, with support for TurnstileWeb.
- WebMemoryRealm can store username / password pairs, Facebook, and Google credentials
+ WebMemoryRealm can store username / password pairs, Facebook, Google, and Digits credentials
  until the application is shut down.
  */
 public class WebMemoryRealm: Realm {
@@ -33,6 +33,8 @@ public class WebMemoryRealm: Realm {
         case let credentials as FacebookAccount:
             return try authenticate(credentials: credentials)
         case let credentials as GoogleAccount:
+            return try authenticate(credentials: credentials)
+        case let credentials as DigitsAccount:
             return try authenticate(credentials: credentials)
         default:
             throw UnsupportedCredentialsError()
@@ -70,7 +72,15 @@ public class WebMemoryRealm: Realm {
             return try register(credentials: credentials)
         }
     }
-    
+
+    private func authenticate(credentials: DigitsAccount) throws -> Account {
+        if let account = accounts.filter({$0.digitsID == credentials.uniqueID}).first {
+            return account
+        } else {
+            return try register(credentials: credentials)
+        }
+    }
+
     /**
      Registers PasswordCredentials against the MemoryRealm.
      */
@@ -94,6 +104,11 @@ public class WebMemoryRealm: Realm {
                 throw AccountTakenError()
             }
             newAccount.googleID = credentials.uniqueID
+        case let credentials as DigitsAccount:
+            guard accounts.filter({$0.digitsID == credentials.uniqueID}).first == nil else {
+                throw AccountTakenError()
+            }
+            newAccount.digitsID = credentials.uniqueID
         default:
             throw UnsupportedCredentialsError()
         }
@@ -113,7 +128,8 @@ public struct MemoryAccount: Account {
     
     public var facebookID: String?
     public var googleID: String?
-    
+    fileprivate var digitsID: String?
+
     init(id: String) {
         uniqueID = id
     }
