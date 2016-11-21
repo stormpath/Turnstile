@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Turnstile
 
 /**
  The OAuth Echo credential represents the info sent to the server for delegated OAuth 1.0a

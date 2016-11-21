@@ -9,8 +9,7 @@
 import Foundation
 import Turnstile
 
-
-enum OAuth1Key: String {
+private enum OAuthKey: String {
     case signatureMethod = "oauth_signature_method"
     case token = "oauth_token"
     case consumerKey = "oauth_consumer_key"
@@ -22,30 +21,34 @@ enum OAuth1Key: String {
 
 
 /**
- Represents an OAuth Token
+ Represents a set of OAuth Authentication Parameters, and helps you parse it out. 
+ This class cannot generate an authentication header nor sign the OAuth parameters.
+ 
+ See https://tools.ietf.org/html/rfc5849#section-3.5
  */
-public class OAuthToken {
+public class OAuthParameters {
+    /// Signature method of the OAuth header
     public let signatureMethod: String
+    
+    /// OAuth Token
     public let token: String
+    
+    /// Consumer Key
     public let consumerKey: String
+    
+    /// Timestamp for the request
     public let timestamp: String
+    
+    /// One time use nonce
     public let nonce: String
+    
+    /// OAuth version number
     public let version: String
+    
+    /// OAuth signature
     public let signature: String
-    public var header: String {
-        get {
-            return "OAuth " +
-            "oauth_signature=\"\(signatureMethod)\"," +
-            "oauth_nonce=\"\(nonce)\"," +
-            "oauth_timestamp=\"\(timestamp)\"," +
-            "oauth_consumer_key=\"\(consumerKey)\"," +
-            "oauth_token=\"\(token)\"," +
-            "oauth_version=\"\(version)\"," +
-            "oauth_signature_method=\"\(signatureMethod)\""
-        }
-    }
-
-    public init(
+    
+    private init(
         signatureMethod: String = "HMAC-SHA1",
         token: String,
         consumerKey: String,
@@ -62,7 +65,8 @@ public class OAuthToken {
         self.version = version
         self.signature = signature
     }
-
+    
+    /// Parses a string (presumably from the authorization header) for its OAuth parameters.
     public convenience init?(header: String) {
         var signatureMethod: String?
         var token: String?
@@ -82,7 +86,7 @@ public class OAuthToken {
         let componentLst = components.map { $0.components(separatedBy: "=") }
 
         componentLst.forEach { component in
-            if let key = OAuth1Key(rawValue: component[0]) {
+            if let key = OAuthKey(rawValue: component[0]) {
                 let value = component[1]
                 switch key {
                 case .signatureMethod:

@@ -29,37 +29,25 @@ public class Digits: OAuthDelegator, Realm {
      */
     public func authenticate(credentials: Credentials) throws -> Account {
         switch credentials {
-        case let credentials as AccessToken:
-            return try authenticate(credentials: credentials)
         case let credentials as OAuthEcho:
             return try authenticate(credentials: credentials)
         default:
             throw UnsupportedCredentialsError()
         }
     }
-
+    
     /**
-     Authenticates a Digits access token.
-     */
-    public func authenticate(credentials: AccessToken) throws -> DigitsAccount {
-//        return DigitsAccount(uniqueID: accountID)
-
-
-        throw IncorrectCredentialsError()
-    }
-
-    /**
-     Authenticates a Digits access token.
+     Authenticates a Digits user using OAuth Echo
      */
     public func authenticate(credentials: OAuthEcho) throws -> DigitsAccount {
-        guard let oauthToken = OAuthToken(header: credentials.authorizationHeader),
+        guard let oauthToken = OAuthParameters(header: credentials.oauthParameters),
             oauthToken.consumerKey == consumerKey,
-            credentials.requestURL.host == authorizationHost else {
+            credentials.authServiceProvider.host == authorizationHost else {
                 throw IncorrectCredentialsError()
         }
 
-        var request = URLRequest(url: credentials.requestURL)
-        request.setValue(credentials.authorizationHeader, forHTTPHeaderField: "Authorization")
+        var request = URLRequest(url: credentials.authServiceProvider)
+        request.setValue(credentials.oauthParameters, forHTTPHeaderField: "Authorization")
 
         guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
             throw APIConnectionError()
@@ -68,8 +56,6 @@ public class Digits: OAuthDelegator, Realm {
         guard let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
             throw InvalidAPIResponse()
         }
-
-        dump(json)
 
         if let accountID = json["id_str"] as? String {
             return DigitsAccount(uniqueID: accountID)
