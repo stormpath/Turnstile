@@ -28,10 +28,10 @@ public class OAuthEcho: Credentials {
      The OAuth parameters passed in through either the `X-Verify-Credentials-Authorization`
      header or body parameters.
      */
-    public let oauthParameters: String
+    public let oauthParameters: OAuthParameters
     
     /// Initializer for OAuth Echo credential data
-    public init(authServiceProvider: URL, oauthParameters: String) {
+    public init(authServiceProvider: URL, oauthParameters: OAuthParameters) {
         self.authServiceProvider = authServiceProvider
         self.oauthParameters = oauthParameters
     }

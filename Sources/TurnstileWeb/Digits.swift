@@ -40,9 +40,8 @@ public class Digits: OAuthDelegator, Realm {
      Authenticates a Digits user using OAuth Echo
      */
     public func authenticate(credentials: OAuthEcho) throws -> DigitsAccount {
-        guard let oauthToken = OAuthParameters(header: credentials.oauthParameters),
-            oauthToken.consumerKey == consumerKey,
-            credentials.authServiceProvider.host == authorizationHost else {
+        guard credentials.oauthParameters.consumerKey == consumerKey,
+            credentials.oauthParameters.authServiceProvider.host == authorizationHost else {
                 throw IncorrectCredentialsError()
         }
 
