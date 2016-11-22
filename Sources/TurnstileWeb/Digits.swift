@@ -41,12 +41,12 @@ public class Digits: OAuthDelegator, Realm {
      */
     public func authenticate(credentials: OAuthEcho) throws -> DigitsAccount {
         guard credentials.oauthParameters.consumerKey == consumerKey,
-            credentials.oauthParameters.authServiceProvider.host == authorizationHost else {
+            credentials.authServiceProvider.host == authorizationHost else {
                 throw IncorrectCredentialsError()
         }
 
         var request = URLRequest(url: credentials.authServiceProvider)
-        request.setValue(credentials.oauthParameters, forHTTPHeaderField: "Authorization")
+        request.setValue(credentials.oauthParameters.header, forHTTPHeaderField: "Authorization")
 
         guard let data = (try? urlSession.executeRequest(request: request))?.0 else {
             throw APIConnectionError()
