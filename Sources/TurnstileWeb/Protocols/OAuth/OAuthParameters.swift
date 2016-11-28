@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Turnstile
 
 private enum OAuthKey: String {
     case signatureMethod = "oauth_signature_method"

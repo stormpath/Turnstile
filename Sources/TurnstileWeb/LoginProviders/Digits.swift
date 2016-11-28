@@ -59,9 +59,6 @@ public class Digits: OAuthDelegator, Realm {
         if let accountID = json["id_str"] as? String {
             return DigitsAccount(uniqueID: accountID)
         }
-        if let accountID = json["id"] as? Int {
-            return DigitsAccount(uniqueID: String(accountID))
-        }
 
         throw IncorrectCredentialsError()
     }
