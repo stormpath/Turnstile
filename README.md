@@ -95,9 +95,9 @@ When the user logs out, `destroySession(identifier:)` should delete the session 
 
 # Turnstile Web
 
-Turnstile Web provides a number of helpers to make authentication for websites easier. TurnstileWeb includes plugins for external login providers, like Facebook and Google. 
+Turnstile Web provides a number of helpers to make authentication for websites easier. TurnstileWeb includes plugins for external login providers, like Facebook, Google, Twitter and Digits. 
 
-## Authenticating with Facebook or Google
+## OAuth2: Authenticating with Facebook or Google
 
 The Facebook and Google Login flows look like the following:
 
@@ -152,6 +152,42 @@ These can throw the following errors:
 
 
 If successful, it will return a `FacebookAccount` or `GoogleAccount`. These implement the `Credentials` protocol, so then can be passed back into your application's Realm for further validation.
+
+## OAuthEcho: Authenticating with Twitter or Digits
+
+The Twitter and Digits Login flows look like the following:
+
+1. Your application prompts for login either with Twitter or Digits
+2. The user selects one and logs in.
+3. Twitter / Digits generates two special headers:
+  - `X-Auth-Service-Provider` the endpoint where the user needs to be authenticated through
+  - `X-Verify-Credentials-Authorization` the OAuth token
+4. The application validates the information in the generated headers
+5. The application makes a `GET` request to the URL in the `X-Auth-Service-Provider` header with the `X-Verify-Credentials-Authorization` header added as the `Authorization` header in this request.
+6. The response is validated to authorize the user and logs them in
+
+### Create a Twitter or Digits Application
+
+The easiest way to setup your app with Twitter or Digits is to use the [Fabric app](https://fabric.io/).  After you go through the setup you will then be able to access the `consumerKey` and `consumerSecret` in the Fabric web interface.  
+
+### Example implementation
+
+```Swift
+let digits = Digits(consumerKey: "consumerKeyGoesHere")
+guard
+    let urlString = request.headers["X-Auth-Service-Provider"],
+    let url = URL(string: urlString),
+    let authHeader = request.headers["X-Verify-Credentials-Authorization"],
+    let oauthParams = OAuthParameters(header: authHeader)
+else {
+    throw Abort.custom(status: .unauthorized, message: "Bad Digits headers")
+}
+
+let credentials: Credentials? = OAuthEcho(authServiceProvider: url, oauthParameters: oauthParams)
+let account = try digits.authenticate(credentials: credentials!) as! DigitsAccount
+```
+
+For an example of Digits in action using Vapor checkout [this app](https://github.com/kdawgwilk/KarmaAPI)
 
 # TurnstileCrypto
 
