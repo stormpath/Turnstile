@@ -13,4 +13,4 @@
  */
 public protocol Credentials { }
 
-public struct Sesssion: Credentials {}
+public struct Session: Credentials {}
