@@ -15,7 +15,7 @@ class WebMemoryRealmTests: XCTestCase {
     let usernamePassword = UsernamePassword(username: "USERNAME", password: "PASSWORD")
     let invalidUsernamePassword = UsernamePassword(username: "INVALID_USERNAME", password: "INVALID_PASSWORD")
     let facebookAccount = FacebookAccount(uniqueID: "FACEBOOK_ACCOUNT", accessToken: AccessToken(string: "FACEBOOK_ACCESS_TOKEN"))
-    let googleAccount = GoogleAccount(uniqueID: "GOOGLE_ACCOUNT", accessToken: AccessToken(string: "ACCESS_TOKEN"), email: "EMAIL@TEST.LOCAL")
+    let googleAccount = GoogleAccount(uniqueID: "GOOGLE_ACCOUNT", accessToken: AccessToken(string: "ACCESS_TOKEN"))
     var realm: WebMemoryRealm!
     
     var validAPIKey: APIKey!

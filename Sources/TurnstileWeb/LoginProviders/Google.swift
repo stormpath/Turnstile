@@ -55,8 +55,10 @@ public class Google: OAuth2, Realm {
         }
         
         if let accountID = json["sub"] as? String
-            , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first, let email = json["email"] as? String {
-            return GoogleAccount(uniqueID: accountID, accessToken: credentials, email: email)
+            , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
+            var account = GoogleAccount(uniqueID: accountID, accessToken: credentials)
+            account.email = json["email"] as? String
+            return GoogleAccount(uniqueID: accountID, accessToken: credentials)
         }
         
         throw IncorrectCredentialsError()
@@ -73,7 +75,12 @@ public class Google: OAuth2, Realm {
 public struct GoogleAccount: Account, Credentials {
     public let uniqueID: String
     public let accessToken: AccessToken
-    public let email: String
+    public var email: String? = nil
+    
+    init(uniqueID: String, accessToken: AccessToken) {
+        self.uniqueID = uniqueID
+        self.accessToken = accessToken
+    }
 }
 
 /// TODO: refactor facebook and google to using this to an "unknown" OAuth error.
