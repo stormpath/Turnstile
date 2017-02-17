@@ -13,4 +13,7 @@
  */
 public protocol Credentials { }
 
-public struct Sesssion: Credentials {}
+@available(*, deprecated, message: "Use 'Session' instead")
+public typealias Sesssion = Session
+
+public struct Session: Credentials {}

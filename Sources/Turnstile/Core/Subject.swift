@@ -61,7 +61,7 @@ public class Subject {
     private func restore(fromSessionID sessionID: String) throws {
         let account = try turnstile.sessionManager.restoreAccount(fromSessionID: sessionID)
         
-        authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: Sesssion.self)
+        authDetails = AuthenticationDetails(account: account, sessionID: sessionID, credentialType: Session.self)
     }
 }
 
