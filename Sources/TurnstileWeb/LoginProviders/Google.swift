@@ -58,7 +58,7 @@ public class Google: OAuth2, Realm {
             , (json["aud"] as? String)?.components(separatedBy: "-").first == clientID.components(separatedBy: "-").first {
             var account = GoogleAccount(uniqueID: accountID, accessToken: credentials)
             account.email = json["email"] as? String
-            return GoogleAccount(uniqueID: accountID, accessToken: credentials)
+            return account
         }
         
         throw IncorrectCredentialsError()
