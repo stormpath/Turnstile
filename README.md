@@ -95,7 +95,7 @@ When the user logs out, `destroySession(identifier:)` should delete the session 
 
 # Turnstile Web
 
-Turnstile Web provides a number of helpers to make authentication for websites easier. TurnstileWeb includes plugins for external login providers, like Facebook, Google, Twitter and Digits. 
+Turnstile Web provides a number of helpers to make authentication for websites easier. TurnstileWeb includes plugins for external login providers, like Facebook, Google, and Digits. 
 
 ## OAuth2: Authenticating with Facebook or Google
 
@@ -155,20 +155,20 @@ If successful, it will return a `FacebookAccount` or `GoogleAccount`. These impl
 
 ## OAuthEcho: Authenticating with Twitter or Digits
 
-The Twitter and Digits Login flows look like the following:
+The Digits Login flows look like the following:
 
 1. Your application prompts for login either with Twitter or Digits
 2. The user selects one and logs in.
-3. Twitter / Digits generates two special headers:
+3. Digits generates two special headers:
   - `X-Auth-Service-Provider` the endpoint where the user needs to be authenticated through
   - `X-Verify-Credentials-Authorization` the OAuth token
 4. The application validates the information in the generated headers
 5. The application makes a `GET` request to the URL in the `X-Auth-Service-Provider` header with the `X-Verify-Credentials-Authorization` header added as the `Authorization` header in this request.
 6. The response is validated to authorize the user and logs them in
 
-### Create a Twitter or Digits Application
+### Create a Digits Application
 
-The easiest way to setup your app with Twitter or Digits is to use the [Fabric app](https://fabric.io/).  After you go through the setup you will then be able to access the `consumerKey` and `consumerSecret` in the Fabric web interface.  
+The easiest way to setup your app with Digits is to use the [Fabric app](https://fabric.io/).  After you go through the setup you will then be able to access the `consumerKey` and `consumerSecret` in the Fabric web interface.  
 
 ### Example implementation
 
