@@ -22,6 +22,9 @@ import Foundation
 public class URandom: Random {
     private let file = fopen("/dev/urandom", "r")
     
+    /// Random singleton. Keep in mind that using this will leave the file connection open.
+    public static let sharedRandom: Random = URandom()
+    
     /// Initialize URandom
     public init() {}
     
@@ -31,10 +34,8 @@ public class URandom: Random {
     
     private func read(numBytes: Int) -> [Int8] {
         // Initialize an empty array with numBytes+1 for null terminated string
-        var bytes = [Int8](repeating: 0, count: numBytes + 1)
-        fgets(&bytes, numBytes + 1, file)
-        
-        bytes.removeLast()
+        var bytes = [Int8](repeating: 0, count: numBytes)
+        fread(&bytes, 1, numBytes, file)
         
         return bytes
     }
