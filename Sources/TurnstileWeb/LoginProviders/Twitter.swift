@@ -1,8 +1,8 @@
 //
-//  Digits.swift
+//  Twitter.swift
 //  TurnstileWeb
 //
-//  Created by Kaden Wilkinson on 11/12/16.
+//  Created by Kaden Wilkinson on 11/30/16.
 //
 //
 
@@ -10,11 +10,11 @@ import Foundation
 import Turnstile
 
 /**
- Digits allows you to authenticate against Digits for login purposes.
+ Twitter allows you to authenticate against Twitter for login purposes.
  */
-public class Digits: OAuthDelegator, Realm {
+public class Twitter: OAuthDelegator, Realm {
 
-    private let authorizationHost = "api.digits.com"
+    private let authorizationHost = "api.twitter.com"
 
     /**
      Create a Twitter object. Uses the Consumer Key from the fabric.io dashboard
@@ -24,7 +24,7 @@ public class Digits: OAuthDelegator, Realm {
     }
 
     /**
-     Authenticates a Digits access token.
+     Authenticates Twitter credentials.
      */
     public func authenticate(credentials: Credentials) throws -> Account {
         switch credentials {
@@ -34,11 +34,11 @@ public class Digits: OAuthDelegator, Realm {
             throw UnsupportedCredentialsError()
         }
     }
-    
+
     /**
-     Authenticates a Digits user using OAuth Echo
+     Authenticates a Twitter user using OAuth Echo
      */
-    public func authenticate(credentials: OAuthEcho) throws -> DigitsAccount {
+    public func authenticate(credentials: OAuthEcho) throws -> TwitterAccount {
         guard credentials.oauthParameters.consumerKey == consumerKey,
             credentials.authServiceProvider.host == authorizationHost else {
                 throw IncorrectCredentialsError()
@@ -56,7 +56,7 @@ public class Digits: OAuthDelegator, Realm {
         }
 
         if let accountID = json["id_str"] as? String {
-            return DigitsAccount(uniqueID: accountID)
+            return TwitterAccount(uniqueID: accountID)
         }
 
         throw IncorrectCredentialsError()
@@ -66,6 +66,6 @@ public class Digits: OAuthDelegator, Realm {
 /**
  A Digits account
  */
-public struct DigitsAccount: Account, Credentials {
+public struct TwitterAccount: Account, Credentials {
     public let uniqueID: String
 }
