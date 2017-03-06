@@ -18,10 +18,10 @@ public protocol SessionManager {
     func restoreAccount(fromSessionID identifier: String) throws -> Account
     
     /// Creates a session for a given Account object and returns the identifier.
-    func createSession(account: Account) -> String
+    func createSession(account: Account) throws -> String
     
     /// Destroys the session for a session identifier.
-    func destroySession(identifier: String)
+    func destroySession(identifier: String) throws
 }
 
 /**
